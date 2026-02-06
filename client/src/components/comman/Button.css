@@ -1,0 +1,53 @@
+/* components/common/Button.css */
+
+.btn {
+  padding: 10px 18px;
+  border-radius: 8px;
+  border: none;
+  cursor: pointer;
+  font-size: 15px;
+  font-weight: 500;
+  transition: all 0.2s ease;
+}
+
+.btn:active {
+  transform: scale(0.97);        
+  box-shadow: 0 2px 6px rgba(0,0,0,0.55);
+}
+
+/* Variants */
+.btn-primary {
+  background: var(--accent);
+  color: var(--button-text);
+}
+
+.btn-primary:hover {
+  background: var(--active-btn);
+}
+
+.btn-outline {
+  background: transparent;
+  border: 1px solid var(--border);
+  color: #4f46e5;
+}
+
+.btn-outline:hover {
+  background: var(--active-btn);
+  color: var(--button-text);
+}
+
+.btn-danger {
+  
+  background: #fd0101; 
+  color: white;
+}
+.btn-danger:hover {
+  background: #a90101;
+  color: white;
+}
+
+/* Disabled */
+.btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}

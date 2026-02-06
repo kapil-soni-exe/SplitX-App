@@ -1,0 +1,66 @@
+:root {
+ --bg-main:#EDF0F8;
+ --bg-card:#F3F3FA;
+ --card-gradiant: radial-gradient(
+    circle at top left,
+    rgba(60,25,230,0.1),
+    rgba(60,25,230,.2),
+    transparent 60%
+ );
+
+ 
+ --card-alpha :#ffffff3f;
+
+ 
+ --glass-bg: rgba(255, 255, 255, 0.258);
+  --glass-border: rgba(83, 79, 79, 0.276);
+
+ 
+
+ --text-primary:#1C1B3E;
+ --text-secondary:#212470;
+ --text-muted:#535584;
+ 
+
+ --accent:#3C19E6;
+ --button-text:#ffff;
+ --active-btn:#3400D3;
+ --interactive-bg:#4c03f77d;
+
+
+
+
+ --border:#7072A8;
+}
+
+[data-theme="dark"] {
+  --bg-main:#111113;
+ --bg-card:#19191B;
+ --card-alpha :#797b861f;
+
+
+ --card-gradiant: linear-gradient(
+  135deg,
+  rgba(61,99,221,0.7),
+  rgba(61,99,221,0.2) 40%,
+  transparent 55%
+ );
+ --bg-secondary:#393A40;
+
+
+ --text-primary:#EEEEF0;
+ --text-secondary:#B2B3BD;
+ --text-muted:#797B86;
+ --glass-bg: rgba(30,41,59,0.55);
+  --glass-border: rgba(148,163,184,0.25);
+
+ --accent:#3D63DD;
+ --button-text:#ffff;
+ --active-btn:#3F5CB0;
+
+
+ --border:#5F606A;
+
+ --interactive-bg:#234ec388;
+ 
+}

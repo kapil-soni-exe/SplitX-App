@@ -1,0 +1,52 @@
+.input-field {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+/* label — subtle */
+.input-label {
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: var(--text-secondary);
+}
+
+/* input base */
+.input {
+  width: 100%;
+  padding: 10px 14px;
+  border-radius: 10px;
+
+  background: var(--bg-card);
+  color: var(--text-primary);
+
+  border: 1px solid var(--border); 
+  font-size: 0.9rem;
+
+  transition:
+    border-color 0.15s ease,
+    box-shadow 0.15s ease;
+}
+
+/* placeholder */
+.input::placeholder {
+  color: var(--text-muted);
+}
+
+/* hover — very light */
+.input:hover {
+  border-color: var(--active-btn)
+}
+
+/* focus — clean ring, no bg jump */
+.input:focus {
+  outline: none;
+  border-color: var(--accent);
+  box-shadow: 0 0 0 1px rgba(60, 25, 230, 0.35);
+}
+
+/* disabled */
+.input:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+}

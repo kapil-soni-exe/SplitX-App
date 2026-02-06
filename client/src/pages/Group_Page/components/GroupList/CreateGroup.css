@@ -1,0 +1,12 @@
+.group-form{
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    
+}
+
+.group-form h3{
+    text-align: center;
+    color: var(--accent);
+    font-size: 1rem;
+}

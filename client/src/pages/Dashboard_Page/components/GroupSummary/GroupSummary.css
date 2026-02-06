@@ -1,0 +1,110 @@
+.group-summary {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  height: 100%;
+}
+.gs-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.gs-title {
+  font-size: 1.2rem;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+.gs-subtitle {
+  font-size: 0.8rem;
+  font-weight: 500;
+  margin-top: 5px;
+  color: var(--text-secondary);
+}
+.gs-dropdown {
+  background-color: transparent;
+  padding: 0.4rem 0.8rem;
+  border-radius: 999px;
+  border: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  color: var(--text-primary);
+  font-size: 0.85rem;
+  cursor: pointer;
+}
+.gs-dropdown span {
+  display: flex;
+}
+
+.gs-main {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.ring-wrap {
+  position: relative;
+  width: 140px;
+  height: 140px;
+  margin: auto;
+}
+
+
+
+.gs-ring-center {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+   pointer-events: none;
+}
+.ring-label {
+  font-size: 0.7rem;
+  letter-spacing: 1px;
+  color: var(--text-muted);
+}
+.ring-value {
+  font-size: 1.2rem;
+  font-weight: 700;
+  color: var(--text-primary);
+}
+
+.gs-stats {
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+}
+
+.gs-stat span {
+  font-size: 0.8rem;
+  color: var(--text-muted);
+}
+.gs-stat strong {
+  font-size: 1rem;
+  color: var(--text-primary);
+  margin-left: 0.5rem;
+}
+.gs-stat.highlight {
+  font-weight: 600;
+}
+.gs-stat.positive {
+  color: #22c55e;
+}
+.gs-stat.negative {
+  color: #ef4444;
+}
+
+.gs-footer {
+  display: flex;
+  justify-content: space-between;
+  font-size: 0.75rem;
+  color: var(--text-muted);
+  padding-top: 0.8rem;
+  border-top: 1px solid var(--border);
+}
+

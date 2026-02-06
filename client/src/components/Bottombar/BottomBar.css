@@ -1,0 +1,101 @@
+.bottom-nav {
+  position: fixed;
+  bottom: 12px;
+  left: 50%;
+  transform: translateX(-50%);
+
+  width: calc(100% - 24px);
+  max-width: 420px;
+
+  height: 64px;
+  padding: 0 10px;
+
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+
+  background: linear-gradient(
+    145deg,
+    var(--bg-card),
+    var(--card-alpha)
+  );
+
+  backdrop-filter: blur(18px);
+  -webkit-backdrop-filter: blur(18px);
+
+  border-radius: 999px;
+
+  border: 1px solid var(--border);
+
+  box-shadow:
+    0 10px 30px rgba(0, 0, 0, 0.25);
+
+  z-index: 999;
+}
+
+/* item */
+.bottom-nav-item {
+  flex: 1;
+  height: 100%;
+
+  text-decoration: none;
+  color: var(--text-muted);
+
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+
+  gap: 3px;
+
+  font-size: 0.6rem;
+  font-weight: 500;
+
+  position: relative;
+
+  transition:
+    color 0.25s ease,
+    transform 0.15s ease;
+}
+
+/* tap */
+.bottom-nav-item:active {
+  transform: scale(0.9);
+}
+
+/* active */
+.bottom-nav-item.active {
+  color: var(--accent);
+}
+
+/* soft glow for active tab */
+.bottom-nav-item.active::before {
+  content: "";
+  position: absolute;
+
+  width: 42px;
+  height: 42px;
+
+  border-radius: 50%;
+
+  background: radial-gradient(
+    circle,
+    color-mix(in srgb, var(--accent) 35%, transparent),
+    transparent 65%
+  );
+
+  z-index: -1;
+}
+
+/* icon size */
+.bottom-nav-item svg {
+  width: 22px;
+  height: 22px;
+}
+
+/* hide on desktop */
+@media (min-width: 769px) {
+  .bottom-nav {
+    display: none;
+  }
+}
