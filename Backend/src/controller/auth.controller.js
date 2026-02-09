@@ -94,4 +94,17 @@ const Login = async (req, res) => {
   }
 };
 
-module.exports = {register,Login};
+
+// LOGOUT
+
+const logout = async (req, res) => {
+  res.cookie("jwt_token", "", { expires: new Date(0) });
+
+  return res.status(200).json({
+    success: true,
+    message: "Logged out successfully",
+  });
+};
+
+
+module.exports = {register,Login,logout};
