@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import Input from "../components/comman/Input";
 import Button from "../components/comman/Button";
 import { Link, useNavigate } from "react-router-dom";
@@ -63,6 +63,7 @@ function Signup() {
           text="Create Accont"
           variant="primary"
           className="auth-submit"
+          type="submit"
         />
       </form>
 
