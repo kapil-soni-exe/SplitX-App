@@ -6,6 +6,8 @@ function Hero() {
   const navigate = useNavigate()
   return (
     <div className="hero">
+      <div class="hero-bg"></div>
+      <div class="hero-grid"></div>
       <div className="hero-content">
         <h3>For friends, roommates & trips</h3>
         <h1>Split Expenses</h1>
