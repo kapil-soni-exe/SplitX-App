@@ -27,6 +27,9 @@ const userSchema= new mongoose.Schema(
       type: String, // image URL
       default: null,
     },
+    
+    refreshToken:String
+    ,
   },
   {
     timestamps: true, // adds createdAt & updatedAt automatically
