@@ -27,6 +27,20 @@ const userSchema= new mongoose.Schema(
       type: String, // image URL
       default: null,
     },
+    isVerified:{
+       type:Boolean,
+       default:false
+    },
+    emailOtpHash:{
+     type: String,
+    },
+    emailOtpExpiresAt: {
+      type: Date,
+    },
+    emailOtpAttempts: {
+      type: Number,
+      default: 0,
+    },
     
     refreshToken:String
     ,

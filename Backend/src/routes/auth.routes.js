@@ -1,6 +1,6 @@
 const express = require("express")
 const router = express.Router()
-const {register,Login,logout,refresh}= require("../controller/auth.controller")
+const {register,Login,logout,refresh, verifyEmail}= require("../controller/auth.controller")
 
 
 // register
@@ -13,6 +13,9 @@ router.post("/logout",logout)
 
 // Refresh Endpoint
 router.post("/refresh",refresh)
+
+// Verify-Email
+router.post("/verify-email",verifyEmail)
 
 
 
