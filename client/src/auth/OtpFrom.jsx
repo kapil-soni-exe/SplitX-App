@@ -1,10 +1,12 @@
 import React, { useState, useEffect } from "react";
 import Input from "../components/comman/Input";
 import Button from "../components/comman/Button";
+import { verifyEmailOtp,resendOtp } from "../../api/auth.api";
 
 function OtpForm({ email, onVerified }) {
   const [otp, setOtp] = useState("");
   const [cooldown, setCooldown] = useState(60);
+  const [loading, setLoading] = useState(false);
 
   // Cooldown timer (UI demo purpose)
   useEffect(() => {
@@ -17,17 +19,31 @@ function OtpForm({ email, onVerified }) {
     return () => clearTimeout(timer);
   }, [cooldown]);
 
-  const handleVerify = (e) => {
+  const handleVerify = async (e) => {
     e.preventDefault();
 
-    // Fake success for UI demo
-    if (otp.length === 6) {
-      onVerified();
+    if (otp.length !== 6) return;
+    try{
+      setLoading(true);
+      await verifyEmailOtp({
+        email,
+        otp
+      })
+     onVerified();
+    }catch(err){
+      console.log(err)
     }
   };
 
-  const handleResend = () => {
+  const handleResend = async () => {
+    try{
+    await resendOtp({email})  
     setCooldown(60); // restart timer
+     
+    }
+    catch(err){
+      console.log(err)
+    }
   };
 
   return (
@@ -48,12 +64,12 @@ function OtpForm({ email, onVerified }) {
           onChange={(e) => setOtp(e.target.value)}
         />
 
-        <Button
-          text="Verify Email"
+         <Button
+          text={loading ? "Verifying..." : "Verify Email"}
           variant="primary"
           className="auth-submit"
           type="submit"
-          disabled={otp.length !== 6}
+          disabled={otp.length !== 6 || loading}
         />
       </form>
 

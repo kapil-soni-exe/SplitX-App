@@ -1,38 +1,36 @@
-const mongoose= require("mongoose")
+const mongoose = require("mongoose");
 
-const userSchema= new mongoose.Schema(
-    {
-    
-        name:{
-            type:String,
-            required:true,
-            trim:true,
-        },
-
+const userSchema = new mongoose.Schema(
+  {
+    name: {
+      type: String,
+      required: true,
+      trim: true,
+    },
 
     email: {
       type: String,
       lowercase: true,
       trim: true,
       unique: true,
-      required:true
+      required: true,
     },
-    password:{
-       type: String,
+    password: {
+      type: String,
       required: true,
       minlength: 6,
       select: false,
     },
-     avatar: {
+    avatar: {
       type: String, // image URL
       default: null,
     },
-    isVerified:{
-       type:Boolean,
-       default:false
+    isVerified: {
+      type: Boolean,
+      default: false,
     },
-    emailOtpHash:{
-     type: String,
+    emailOtpHash: {
+      type: String,
     },
     emailOtpExpiresAt: {
       type: Date,
@@ -41,14 +39,27 @@ const userSchema= new mongoose.Schema(
       type: Number,
       default: 0,
     },
-    
-    refreshToken:String
-    ,
+
+    otpLastSentAt: {
+      type: Date,
+    },
+
+    otpResendCount: {
+      type: Number,
+      default: 0,
+    },
+
+    otpResendWindowStart: {
+      type: Date,
+    },
+
+    refreshToken: String,
   },
   {
     timestamps: true, // adds createdAt & updatedAt automatically
-  })
+  },
+);
 
-  const userModel = mongoose.model("User",userSchema)
+const userModel = mongoose.model("User", userSchema);
 
-  module.exports = userModel
+module.exports = userModel;

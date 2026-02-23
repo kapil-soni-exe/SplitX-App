@@ -2,6 +2,10 @@ const User = require("../models/users.model");
 const jwt = require("jsonwebtoken");
 const bcrypt = require("bcrypt");
 const crypto = require("crypto");
+const {
+  sendOtpEmail,
+  sendVerifySuccessEmail,
+} = require("../services/email.service");
 
 const signToken = (userId) => {
   return jwt.sign({ id: userId }, process.env.JWT_SECRET, { expiresIn: "15m" });
@@ -49,7 +53,11 @@ const register = async (req, res) => {
       emailOtpExpiresAt: Date.now() + 10 * 60 * 1000,
     });
 
-    console.log("OTP:", otp);
+    // Sending Email for verification
+    await sendOtpEmail({
+      to: email,
+      otp,
+    });
 
     return res.status(201).json({
       message: "OTP sent to email",
@@ -258,13 +266,18 @@ const verifyEmail = async (req, res) => {
         message: "Invalid OTP",
       });
     }
-    // ✅ OTP correct
+    //  OTP correct
     user.isVerified = true;
     user.emailOtpHash = undefined;
     user.emailOtpExpiresAt = undefined;
     user.emailOtpAttempts = 0;
 
     await user.save();
+
+    await sendVerifySuccessEmail({
+      to: user.email,
+      name: user.name,
+    });
 
     return res.status(200).json({
       message: "Email verified successfully",
@@ -277,4 +290,78 @@ const verifyEmail = async (req, res) => {
   }
 };
 
-module.exports = { register, Login, logout, refresh,verifyEmail };
+// Resend Otp
+const resendOtp = async (req, res) => {
+  try {
+    const { email } = req.body;
+    if (!email) {
+      return res.status(400).json({ message: "Email required" });
+    }
+
+    const user = await User.findOne({ email });
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
+
+    if (user.isVerified) {
+      return res.status(400).json({ message: "Email already verified" });
+    }
+
+    const NOW = Date.now();
+    const COOLDOWN = 60 * 1000; // 60 sec
+
+    // cooldown check
+    if (user.otpLastSentAt) {
+      const diff = NOW - new Date(user.otpLastSentAt).getTime();
+      if (diff < COOLDOWN) {
+        const wait = Math.ceil((COOLDOWN - diff) / 1000);
+        return res.status(429).json({
+          message: `Please wait ${wait}s before resending OTP`,
+        });
+      }
+    }
+    // 24h window check
+    if (!user.otpResendWindowStart) {
+      user.otpResendWindowStart = NOW;
+      user.otpResendCount = 0;
+    }
+
+    const hoursPassed =
+      (NOW - new Date(user.otpResendWindowStart).getTime()) / (1000 * 60 * 60);
+
+    if (hoursPassed >= 24) {
+      user.otpResendCount = 0;
+      user.otpResendWindowStart = NOW;
+    }
+
+    // limit reached
+    if (user.otpResendCount >= 3) {
+      return res.status(429).json({
+        message: "Resend limit reached. Try again after 24 hours.",
+      });
+    }
+    //  generate new OTP
+    const otp = crypto.randomInt(100000, 999999).toString();
+    const otpHash = await bcrypt.hash(otp, 10);
+
+    user.emailOtpHash = otpHash;
+    user.emailOtpExpiresAt = NOW + 10 * 60 * 1000;
+    user.emailOtpAttempts = 0;
+    user.otpLastSentAt = NOW;
+    user.otpResendCount += 1;
+
+    await user.save();
+
+    // email send
+    await sendOtpEmail({ to: email, otp });
+
+    return res.status(200).json({
+      message: "OTP resent successfully",
+    });
+  } catch (err) {
+    console.error(err);
+    return res.status(500).json({ message: "Server error" });
+  }
+};
+
+module.exports = { register, Login, logout, refresh, verifyEmail,resendOtp };
