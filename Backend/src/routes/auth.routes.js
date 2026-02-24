@@ -1,7 +1,7 @@
 const express = require("express")
 const router = express.Router()
-const {register,Login,logout,refresh, verifyEmail, resendOtp}= require("../controller/auth.controller")
-
+const {register,Login,logout,refresh, verifyEmail, resendOtp,me}= require("../controller/auth.controller")
+const Protected = require("../../middleware/auth.middleware")
 
 // register
 router.post("/register",register)
@@ -19,6 +19,9 @@ router.post("/verify-email",verifyEmail)
 
 // Resend OTP
 router.post("/resend-otp", resendOtp)
+
+// Get Auth/me
+router.get("/me",Protected,me)
 
 
 
