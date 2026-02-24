@@ -48,7 +48,7 @@ function OtpForm({ email, onVerified }) {
 
   return (
     <div>
-      <p style={{ marginBottom: "1rem" }}>
+      <p className="otp-form">
         We’ve sent a 6-digit code to <strong>{email}</strong>
       </p>
 

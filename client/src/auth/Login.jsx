@@ -4,12 +4,13 @@ import Button from "../components/comman/Button";
 import { Link } from "react-router-dom";
 import { useNavigate } from "react-router-dom";
 import { loginUser } from "../../api/auth.api";
+import { useAuth } from "../context/AuthContext";
 
 function Login() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
-
+  const { setUser } = useAuth();
   const navigate = useNavigate();
   const handleLogin = async (e) => {
     e.preventDefault();
@@ -17,7 +18,7 @@ function Login() {
     
     try{
       const res = await loginUser({email,password})
-       console.log("login success:", res.data);
+      setUser(res.data.user);
 
       navigate("/dashboard");
     }catch(err){

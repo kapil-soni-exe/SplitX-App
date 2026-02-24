@@ -113,6 +113,11 @@
     font-weight: 500;
 }
 
+.otp-form{
+    color: var(--text-primary);
+    margin-bottom: 1rem;
+}
+
 
 
 @media(max-width: 768px){
