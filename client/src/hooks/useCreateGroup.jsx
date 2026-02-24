@@ -1,7 +1,7 @@
 import { createGroup,fetchGroups } from "../../api/group.api";
 export const useCreateGroup = () => {
-  const create = async (name, userId) => {
-    const res = await createGroup({ name, userId });
+  const create = async (name) => {
+    const res = await createGroup({ name });
 
     const group = res.data.data;
 

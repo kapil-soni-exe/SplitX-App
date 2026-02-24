@@ -28,9 +28,6 @@ export function useGroupManager() {
     }
   }, [groups]);
 
-  const selectedGroup = groups.find(
-    (group) => group._id === selectedGroupId
-  );
 
   // click select
   const selectGroup = (id) => {
@@ -41,11 +38,12 @@ export function useGroupManager() {
   const addGroup = (newGroup) => {
     setGroups((prev) => [newGroup, ...prev]);
     setSelectedGroupId(newGroup._id);
+
   };
+
 
   return {
     groups,
-    selectedGroup,
     selectedGroupId,
     selectGroup,
     addGroup,
