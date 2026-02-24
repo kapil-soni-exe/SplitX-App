@@ -16,3 +16,7 @@ export const resendOtp = (data) => {
 export const logoutUser = () => {
   return apiClient.post("/auth/logout");
 };
+
+export const AuthMe = ()=>{
+  return apiClient.get("/auth/me")
+}
