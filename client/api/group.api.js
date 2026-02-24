@@ -7,3 +7,7 @@ export const createGroup = (payload) => {
 export const fetchGroups = () => {
   return apiClient.get("/groups");
 };
+
+export const FetchGroupbyId=(groupId)=>{
+  return apiClient.get(`/groups/${groupId}`)
+}
