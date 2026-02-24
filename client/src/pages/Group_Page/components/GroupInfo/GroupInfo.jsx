@@ -1,13 +1,21 @@
 import React from "react";
 import "./GroupInfo.css";
 import { RiArrowLeftCircleLine } from "@remixicon/react";
+import { useGroupDetail } from "../../../../hooks/useGroupDetail";
 
-function GroupInfo({ group, onBack }) {
-  if (!group) return null;
+function GroupInfo({ groupId, onBack }) {
+  const { group, loading } = useGroupDetail(groupId);
+
+  if (loading) {
+    return <div className="group-loading">Loading group info…</div>;
+  }
+
+  if (!group) {
+    return <div className="group-info-empty">Group not found</div>;
+  }
 
   return (
     <div className="group-info-panel">
-
       {/* HEADER */}
       <div className="group-info-header">
         <button className="group-info-back" onClick={onBack}>
@@ -18,9 +26,7 @@ function GroupInfo({ group, onBack }) {
 
       {/* SUMMARY */}
       <div className="group-info-summary">
-        <div className="group-info-avatar">
-          {group.name[0]}
-        </div>
+        <div className="group-info-avatar">{group.name[0]}</div>
 
         <h2>{group.name}</h2>
         <p>{group.members.length} members</p>
@@ -32,9 +38,7 @@ function GroupInfo({ group, onBack }) {
 
         {group.members.map((m) => (
           <div key={m.id} className="group-info-member">
-            <div className="member-avatar">
-              {m.name[0]}
-            </div>
+            <div className="member-avatar">{m.name[0]}</div>
             <span>{m.name}</span>
           </div>
         ))}
@@ -45,7 +49,6 @@ function GroupInfo({ group, onBack }) {
         <button className="mute-btn">Mute notifications</button>
         <button className="exit-btn">Exit group</button>
       </div>
-
     </div>
   );
 }

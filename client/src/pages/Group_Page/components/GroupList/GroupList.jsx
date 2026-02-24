@@ -17,13 +17,12 @@ function GroupList({ groups, selectedGroupId, onSelectGroup, onGroupCreated }) {
   const [search, setSearch] = useState("");
   const [open, setOpen] = useState(false);
   const visibleSearch = filterGroupsBySearch(groups, search);
-  const currentUserId = "698057b1a4d18bd0b4b9e7d2";
   const [createdGroup, setCreatedGroup] = useState(null);
   const [inviteLink, setInviteLink] = useState(null);
 
   const handleCreateGroup = async (name) => {
     try {
-      const { group, inviteLink } = await create(name, currentUserId);
+      const { group, inviteLink } = await create(name);
 
       setCreatedGroup(group);
       setInviteLink(inviteLink);

@@ -4,17 +4,18 @@ import "./Group.css";
 import GroupDetails from "./components/GroupDetails/GroupDetails";
 import { useOutletContext } from "react-router-dom";
 import GroupInfo from "./components/GroupInfo/GroupInfo";
-import { useGroups } from "../../hooks/useCreateGroup";
+
 import { useGroupManager } from "../../hooks/useGroupManager";
 
 function Group() {
-  const { groups, selectedGroup, selectedGroupId, selectGroup, addGroup } =
+  const { groups, selectedGroupId, selectGroup, addGroup } =
     useGroupManager();
 
   const [showChatMobile, setShowChatMobile] = useState(false);
   const [showGroupInfo, setShowGroupInfo] = useState(false);
 
   const handleSelectGroup = (id) => {
+    
     selectGroup(id);
     if (window.innerWidth <= 768) {
       setShowChatMobile(true);
@@ -45,9 +46,9 @@ function Group() {
       </div>
 
       <div className={`groups-right ${showChatMobile ? "show-mobile" : ""}`}>
-        {selectedGroup ? (
+        {selectedGroupId ? (
           <GroupDetails
-            group={selectedGroup}
+            groupId={selectedGroupId}
             onBack={() => setShowChatMobile(false)}
             onOpenInfo={() => setShowGroupInfo(true)}
           />
@@ -57,9 +58,9 @@ function Group() {
       </div>
 
       <div className={`groups-info ${showGroupInfo ? "show-info" : ""}`}>
-        {showGroupInfo && selectedGroup && (
+        {showGroupInfo && selectedGroupId && (
           <GroupInfo
-            group={selectedGroup}
+            groupId={selectedGroupId}
             onBack={() => setShowGroupInfo(false)}
           />
         )}
