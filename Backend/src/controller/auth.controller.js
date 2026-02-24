@@ -364,4 +364,34 @@ const resendOtp = async (req, res) => {
   }
 };
 
-module.exports = { register, Login, logout, refresh, verifyEmail,resendOtp };
+/**
+ * GET /auth/me
+ *
+ * Purpose:
+ * - Returns the currently authenticated user's basic info
+ * - Used by frontend to restore auth state on page refresh
+ */
+
+const me = async (req, res) => {
+  try {
+    const user = req.user;
+
+    return res.status(200).json({
+      success: true,
+      user: {
+        id: user._id,
+        name: user.name,
+        email: user.email,
+        isVerified: user.isVerified,
+      },
+    });
+  } catch (err) {
+    console.log(err);
+    return res.status(500).json({
+      success: false,
+      message: "Failed to fetch user session",
+    });
+  }
+};
+
+module.exports = { register, Login, logout, refresh, verifyEmail, resendOtp,me };
