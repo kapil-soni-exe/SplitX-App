@@ -2,10 +2,19 @@ import React from "react";
 import "./GroupInfo.css";
 import { RiArrowLeftCircleLine } from "@remixicon/react";
 import { useGroupDetail } from "../../../../hooks/useGroupDetail";
+import InviteSuccess from "../GroupList/InviteLink";
 
 function GroupInfo({ groupId, onBack }) {
   const { group, loading } = useGroupDetail(groupId);
 
+  // Admin Check
+  const isAdmin = (memberId) => {
+    return (
+    memberId?.toString() === group.createdBy?._id?.toString()
+  );
+  };
+
+  
   if (loading) {
     return <div className="group-loading">Loading group info…</div>;
   }
@@ -30,18 +39,26 @@ function GroupInfo({ groupId, onBack }) {
 
         <h2>{group.name}</h2>
         <p>{group.members.length} members</p>
+        <InviteSuccess
+          inviteLink={`${window.location.origin}/join/${group.inviteCode}`}
+        />
       </div>
 
       {/* MEMBERS */}
       <div className="group-info-members">
-        <h4>Members</h4>
+        <div className="members-header">Members</div>
+        <div className="members-scroll">
+          {group.members.map((m) => (
+            <div key={m._id} className="group-info-member">
+              <div className="member-avatar">{m.name[0]}</div>
+              <div className="member-info">
+                <span className="member-name">{m.name}</span>
 
-        {group.members.map((m) => (
-          <div key={m.id} className="group-info-member">
-            <div className="member-avatar">{m.name[0]}</div>
-            <span>{m.name}</span>
-          </div>
-        ))}
+                {isAdmin(m._id) && <span className="admin-badge">Admin</span>}
+              </div>
+            </div>
+          ))}
+        </div>
       </div>
 
       {/* ACTIONS */}
