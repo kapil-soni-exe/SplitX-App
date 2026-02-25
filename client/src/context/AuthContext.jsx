@@ -4,6 +4,7 @@ import { AuthMe } from "../../api/auth.api";
 import { useEffect } from "react";
 import { useContext } from "react";
 import { createContext } from "react";
+import { logoutUser } from "../../api/auth.api";
 
 
 export const AuthContext = createContext(null)
@@ -31,12 +32,23 @@ export function AuthProvider({children}){
     loadMe()
    },[])
 
+    const logout = async () => {
+    try {
+      await logoutUser();
+    } catch (err) {
+      console.error("Logout error", err);
+    } finally {
+      setUser(null); 
+    }
+  };
+
    return(
     <AuthContext.Provider
     value={{
         user,
         loading,
-        setUser
+        setUser,
+        logout
     }}>
         {children}
     </AuthContext.Provider>
