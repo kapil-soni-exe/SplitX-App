@@ -1,28 +1,19 @@
-/* ROOT PANEL */
-
 .group-info-panel {
   height: 100%;
+  background-color: var(--bg-main);
+  color: var(--text-primary);
   display: flex;
   flex-direction: column;
-
-  background: var(--bg-main);
-  color: var(--text-primary);
+  overflow: hidden;
 }
-
-/* ================= HEADER ================= */
 
 .group-info-header {
   display: flex;
   align-items: center;
-  gap: 10px;
+  gap: 6px;
 
-  padding: 0.9rem 1rem;
-
+  padding: 0.5rem 0.7rem;
   border-bottom: 1px solid var(--border);
-
-  position: sticky;
-  top: 0;
-  z-index: 20;
 
   background: var(--bg-main);
 }
@@ -32,12 +23,11 @@
   font-size: 1rem;
   font-weight: 600;
 }
-
 .group-info-back {
   background: none;
   border: none;
   cursor: pointer;
-  padding: 4px;
+  padding: 3px;
 
   display: flex;
   align-items: center;
@@ -46,33 +36,24 @@
   color: var(--text-primary);
 }
 
-/* ================= SUMMARY ================= */
-
 .group-info-summary {
-  padding: 1.2rem 1rem;
+  padding: 1.2rem 1rem 0.8rem;
 
   display: flex;
   flex-direction: column;
   align-items: center;
 
   text-align: center;
-
   border-bottom: 1px solid var(--border);
 }
-
 .group-info-avatar {
   width: 72px;
   height: 72px;
 
   border-radius: 50%;
+  background: linear-gradient(135deg, var(--accent), var(--active-btn));
 
-  background: linear-gradient(
-    135deg,
-    var(--accent),
-    var(--active-btn)
-  );
-
-  color: white;
+  color: #fff;
   font-size: 1.6rem;
   font-weight: 600;
 
@@ -87,37 +68,96 @@
   margin: 0;
   font-size: 1.1rem;
 }
-
 .group-info-summary p {
-  margin: 4px 0 0;
+  margin: 4px 0 10px;
   font-size: 0.75rem;
   color: var(--text-muted);
 }
+.invite-success {
+  width: 100%;
 
-/* ================= MEMBERS ================= */
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
 
-.group-info-members {
-  flex: 1;
+  padding: 8px 12px;
+  margin-top: 6px;
 
-  padding: 0.8rem 1rem;
-
-  overflow-y: auto;
+  border-radius: 10px;
+  background: var(--card-alpha);
 }
-
-.group-info-members h4 {
-  margin: 0 0 0.6rem;
+.invite-success h3 {
+  margin: 0;
   font-size: 0.8rem;
-  color: var(--text-muted);
   font-weight: 600;
 }
 
+.invite-success p {
+  display: none;
+}
+
+.invite-success button {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+
+  padding: 5px 10px;
+  font-size: 0.75rem;
+
+  border-radius: 999px;
+
+  color: #fff;
+  border: none;
+  cursor: pointer;
+}
+.group-info-members {
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.members-header {
+  padding: 0.6rem 1rem;
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: var(--text-muted);
+  border-bottom: 1px solid var(--border);
+}
+
+.members-scroll {
+  flex: 1;
+  overflow-y: auto;
+  overflow-x: hidden;
+  padding: 0 1rem;
+  overscroll-behavior: contain;
+  scroll-behavior: smooth;
+}
+.members-scroll::-webkit-scrollbar {
+  width: 6px;
+}
+.members-scroll::-webkit-scrollbar-track {
+  background: transparent;
+}
+.members-scroll::-webkit-scrollbar-thumb {
+  background: var(--accent);
+  border-radius: 10px;
+}
+.members-scroll::-webkit-scrollbar-thumb:hover {
+  background: var(--accent);
+}
+.members-scroll {
+  scrollbar-width: thin;
+  scrollbar-color: var(--active-btn) transparent;
+}
+/* Member row */
 .group-info-member {
   display: flex;
   align-items: center;
   gap: 10px;
 
   padding: 0.55rem 0;
-
   border-bottom: 1px solid var(--border);
 }
 
@@ -126,7 +166,6 @@
   height: 34px;
 
   border-radius: 50%;
-
   background: var(--card-alpha);
 
   display: flex;
@@ -139,60 +178,91 @@
   color: var(--text-primary);
 }
 
-/* ================= ACTIONS ================= */
-
 .group-info-actions {
-  padding: 0.9rem 1rem;
-
+  padding: 0.6rem 1rem;
   border-top: 1px solid var(--border);
 
   display: flex;
-  flex-direction: column;
-  gap: 8px;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
 }
 
+/* Mute = secondary */
 .mute-btn {
   background: var(--card-alpha);
   border: 1px solid var(--border);
 
-  padding: 0.6rem;
+  padding: 0.4rem 0.75rem;
+  border-radius: 999px;
 
-  border-radius: 12px;
-
-  font-size: 0.75rem;
+  font-size: 0.7rem;
   cursor: pointer;
+  white-space: nowrap;
 
   color: var(--text-primary);
 }
+/* Admin badge */
+.member-info {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
 
+.member-name {
+  font-size: 0.85rem;
+}
+
+.admin-badge {
+  font-size: 0.65rem;
+  padding: 2px 6px;
+  border-radius: 6px;
+
+  background: rgba(37, 211, 102, 0.15);
+  color: #25d366;
+
+  font-weight: 600;
+  line-height: 1;
+}
+
+/* Exit btn */
 .exit-btn {
   background: transparent;
-  border: 1px solid rgba(255, 80, 80, 0.5);
+  border: 1px solid rgba(255, 80, 80, 0.6);
 
-  padding: 0.6rem;
+  padding: 0.4rem 0.75rem;
+  border-radius: 999px;
 
-  border-radius: 12px;
-
-  font-size: 0.75rem;
+  font-size: 0.7rem;
   cursor: pointer;
+  white-space: nowrap;
 
   color: rgb(255, 80, 80);
 }
 
-/* ================= MOBILE POLISH ================= */
+.exit-btn:hover {
+  background: rgba(255, 80, 80, 0.08);
+}
 
+.mute-btn:hover {
+  background: var(--glass-bg);
+}
 @media (max-width: 768px) {
-
-  .group-info-panel {
-    height: 100vh;
+  .group-info-actions {
+    padding: 0.75rem 1rem;
+    gap: 12px;
   }
 
-  .group-info-summary {
-    padding-top: 1.4rem;
+  .mute-btn,
+  .exit-btn {
+    padding: 0.55rem 1rem;
+    font-size: 0.75rem;
+  }
+  .group-info-panel {
+    height: 100%;
   }
 
   .group-info-actions {
     padding-bottom: calc(1rem + env(safe-area-inset-bottom));
   }
-
 }
