@@ -5,13 +5,19 @@ import { Link } from "react-router-dom";
 import { useNavigate } from "react-router-dom";
 import { loginUser } from "../../api/auth.api";
 import { useAuth } from "../context/AuthContext";
+import { useLocation } from "react-router-dom";
 
 function Login() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
   const { setUser } = useAuth();
+  const location = useLocation()
+
   const navigate = useNavigate();
+
+  const redirectTo = location.state?.redirectTo || "/dashboard";
+
   const handleLogin = async (e) => {
     e.preventDefault();
     setError("")
@@ -20,7 +26,7 @@ function Login() {
       const res = await loginUser({email,password})
       setUser(res.data.user);
 
-      navigate("/dashboard");
+      navigate(redirectTo, { replace: true });
     }catch(err){
       setError(err.message || "Login failed");
     }
