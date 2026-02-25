@@ -6,6 +6,8 @@ import AuthLayout from "../auth/AuthLayout";
 import DashboardLayout from "../layouts/DashboardLayout";
 import Dashboard from "../pages/Dashboard_Page/Dashboard";
 import Group from "../pages/Group_Page/Group";
+import InviteCheck from "../pages/Group_Page/components/GroupList/InviteCheck";
+import ProtectedRoute from "../components/ProtectedRoute";
 
 export const router = createBrowserRouter([
   {
@@ -26,10 +28,22 @@ export const router = createBrowserRouter([
     children: [
       {
         path: "dashboard",
-        element: <Dashboard />,
+        element: (
+        <ProtectedRoute>
+          <Dashboard />
+        </ProtectedRoute>
+        ),
       },
 
-      { path: "groups", element: <Group /> },
+      { path: "groups", element: (
+        <ProtectedRoute>
+          <Group/>
+        </ProtectedRoute>
+      ) },
     ],
   },
+  {
+    path:"/invite/:inviteCode",
+    element:<InviteCheck/>
+  }
 ]);
