@@ -3,6 +3,7 @@ const cookieParser= require("cookie-parser")
 
 const groupRoutes = require("./routes/group.routes");
 const authRoutes= require("./routes/auth.routes")
+const expenseRoutes = require("./routes/expense.route")
 const cors = require("cors");
 
 require("./models/users.model");
@@ -21,5 +22,7 @@ app.use(cookieParser())
 
 app.use("/api/groups", groupRoutes);
 app.use("/api/auth",authRoutes)
+app.use("/api/expenses",expenseRoutes)
+
 
 module.exports = app;
