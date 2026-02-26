@@ -1,4 +1,4 @@
-const mongoose = require("mongoose")
+const mongoose = require("mongoose");
 
 const splitSchema = new mongoose.Schema(
   {
@@ -8,17 +8,9 @@ const splitSchema = new mongoose.Schema(
       required: true,
     },
 
-    // used when splitType === "EXACT"
+    // only used when splitType === "UNEQUAL"
     amount: {
       type: Number,
-      min: 0,
-    },
-
-    // used when splitType === "PERCENT"
-    percent: {
-      type: Number,
-      min: 0,
-      max: 100,
     },
   },
   { _id: false }
@@ -39,17 +31,15 @@ const expenseSchema = new mongoose.Schema(
       trim: true,
     },
 
-    note: String,
+    note: {
+      type: String,
+      trim: true,
+    },
 
     amount: {
       type: Number,
       required: true,
-      min: 1, // paise
-    },
-
-    currency: {
-      type: String,
-      default: "INR",
+      min: 1,
     },
 
     paidBy: {
@@ -60,13 +50,17 @@ const expenseSchema = new mongoose.Schema(
 
     splitType: {
       type: String,
-      enum: ["EQUAL", "EXACT", "PERCENT"],
-      default: "EQUAL",
+      enum: ["EQUAL", "EXACT"],
+      required: true,
     },
 
     splits: {
       type: [splitSchema],
       required: true,
+      validate: [
+        (v) => v.length > 0,
+        "At least one split is required",
+      ],
     },
 
     expenseDate: {
@@ -74,31 +68,18 @@ const expenseSchema = new mongoose.Schema(
       required: true,
     },
 
-    category: String,
-
     createdBy: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "User",
       required: true,
     },
 
-    // used when someone pays back
-    isSettlement: {
-      type: Boolean,
-      default: false,
-      index: true,
+    deletedAt: {
+      type: Date,
+      default: null,
     },
-
-    deletedAt: Date,
   },
-  {
-    timestamps: true,
-  }
+  { timestamps: true }
 );
 
-const Expense = mongoose.model(
-  "Expense",
-  expenseSchema
-);
-
-module.exports = Expense
+module.exports = mongoose.model("Expense", expenseSchema);
