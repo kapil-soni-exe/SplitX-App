@@ -1,11 +1,12 @@
+export function activityFormatter(expense, group, currentUser) {
+  if (!expense || !currentUser) return "";
 
+  const isOutgoing =
+    expense.paidBy?._id?.toString() === currentUser?._id?.toString();
 
-export function activityFormatter(expense, group, currentUserId){
+  const name = isOutgoing
+    ? "You"
+    : expense.paidBy?.name || "Someone";
 
-    const isOutgoing = expense.paidBy === currentUserId
-    const payer =group.members.find((m)=> m.id===expense.paidBy)
-    let name = isOutgoing?"You" : payer?.name
-    
-    return `${name} added ₹${expense.amount} for ${expense.title}`
-
+  return `${name} added ₹${expense.amount} for ${expense.title}`;
 }
