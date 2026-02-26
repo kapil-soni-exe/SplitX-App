@@ -124,8 +124,86 @@ const getGroupbyId = async (req, res) => {
   }
 };
 
+// Check Invite Code
+const CheckInviteCode = async (req, res) => {
+  try {
+    const { inviteCode } = req.params;
+
+    //group find by inviteCode
+    const group = await Group.findOne({ inviteCode });
+
+    // If Group not Exists
+    if (!group) {
+      return res.status(404).json({
+        success: false,
+        message: "Invalid invite link",
+      });
+    }
+
+    // If Group found
+    return res.status(200).json({
+      success: true,
+      data: {
+        _id: group._id,
+        name: group.name,
+        membersCount: group.members.length,
+      },
+    });
+  } catch (err) {
+    console.error("Invite check error:", error);
+    return res.status(500).json({
+      success: false,
+      message: "Server error",
+    });
+  }
+};
+
+// Join Group From ID
+const joinGroup = async (req, res) => {
+  try {
+    const { inviteCode } = req.params;
+    const userId = req.user.id;
+
+    const group = await Group.findOne({ inviteCode });
+
+    if (!group) {
+      return res.status(404).json({
+        success: false,
+        message: "Invalid invite link",
+      });
+    }
+
+    // already member → just return group
+    if (group.members.some((m) => m.toString() === userId)) {
+      return res.json({
+        success: true,
+        data: group,
+      });
+    }
+
+    group.members.push(userId);
+    await group.save();
+
+    console.log("JOIN USER:", req.user.id);
+    console.log("GROUP:", group._id);
+
+    return res.json({
+      success: true,
+      data: group,
+    });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({
+      success: false,
+      message: "Join failed",
+    });
+  }
+};
+
 module.exports = {
   createGroup,
   getAllgroup,
   getGroupbyId,
+  CheckInviteCode,
+  joinGroup
 };
