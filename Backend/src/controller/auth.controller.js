@@ -355,6 +355,9 @@ const resendOtp = async (req, res) => {
     // email send
     await sendOtpEmail({ to: email, otp });
 
+    console.log("OTP GENERATED:", otp);
+    console.log("EMAIL:", email);
+
     return res.status(200).json({
       message: "OTP resent successfully",
     });
