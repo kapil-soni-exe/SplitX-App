@@ -1,5 +1,41 @@
 const mongoose = require("mongoose");
 
+const lastExpenseSchema = new mongoose.Schema(
+  {
+    expenseId: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Expense",
+    },
+    title: {
+      type: String,
+      trim: true,
+    },
+    amount: {
+      type: Number,
+    },
+    createdBy: {
+      _id: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "User",
+      },
+      name: String,
+    },
+
+    paidBy: {
+      _id: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "User",
+      },
+      name: String,
+    },
+
+    createdAt: {
+      type: Date,
+    },
+  },
+  { _id: false },
+);
+
 const groupSchema = new mongoose.Schema(
   {
     name: {
@@ -8,7 +44,7 @@ const groupSchema = new mongoose.Schema(
       trim: true,
     },
 
-      inviteCode: {
+    inviteCode: {
       type: String,
       unique: true,
       required: true,
@@ -32,6 +68,7 @@ const groupSchema = new mongoose.Schema(
       type: String,
       default: "INR",
     },
+    lastExpense: lastExpenseSchema,
 
     isArchived: {
       type: Boolean,
@@ -40,8 +77,7 @@ const groupSchema = new mongoose.Schema(
   },
   {
     timestamps: true,
-  }
-  
+  },
 );
 
 const groupModel = mongoose.model("Group", groupSchema);
