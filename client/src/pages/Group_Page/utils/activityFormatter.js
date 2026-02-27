@@ -1,10 +1,12 @@
-export function activityFormatter(expense, group, currentUser) {
-  if (!expense || !currentUser) return "";
+export function activityFormatter(expense, userId) {
+  const paidById =
+    typeof expense.paidBy === "string"
+      ? expense.paidBy
+      : expense.paidBy?._id?.toString();
 
-  const isOutgoing =
-    expense.paidBy?._id?.toString() === currentUser?._id?.toString();
+  const isMe = paidById === userId;
 
-  const name = isOutgoing
+  const name = isMe
     ? "You"
     : expense.paidBy?.name || "Someone";
 
