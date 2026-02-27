@@ -4,25 +4,26 @@ import "./Group.css";
 import GroupDetails from "./components/GroupDetails/GroupDetails";
 import { useOutletContext } from "react-router-dom";
 import GroupInfo from "./components/GroupInfo/GroupInfo";
-
+import { useAuth } from "../../context/AuthContext";
 import { useGroupManager } from "../../hooks/useGroupManager";
 
 function Group() {
-  const { groups, selectedGroupId, selectGroup, addGroup } =
+  const { groups, selectedGroupId, selectGroup, addGroup, fetchGroups } =
     useGroupManager();
 
   const [showChatMobile, setShowChatMobile] = useState(false);
   const [showGroupInfo, setShowGroupInfo] = useState(false);
+  const { user } = useAuth();
+  const { setHideBottomBar } = useOutletContext();
 
-  const handleSelectGroup = (id) => {
-    
-    selectGroup(id);
+  // 🔥 SINGLE SOURCE TO OPEN GROUP (DESKTOP + MOBILE)
+  const openGroup = (groupId) => {
+    selectGroup(groupId);
+
     if (window.innerWidth <= 768) {
       setShowChatMobile(true);
     }
   };
-
-  const { setHideBottomBar } = useOutletContext();
 
   useEffect(() => {
     if ((showChatMobile || showGroupInfo) && window.innerWidth <= 768) {
@@ -36,27 +37,32 @@ function Group() {
 
   return (
     <div className="groups-page">
+      {/* LEFT */}
       <div className={`groups-left ${showChatMobile ? "hide-mobile" : ""}`}>
         <GroupList
           groups={groups}
           selectedGroupId={selectedGroupId}
-          onSelectGroup={handleSelectGroup}
-          onGroupCreated={addGroup}
+          onSelectGroup={openGroup}     // ✅ IMPORTANT
+          onGroupCreated={addGroup}     // ✅ IMPORTANT
+          currentUser={user}
         />
       </div>
 
+      {/* RIGHT */}
       <div className={`groups-right ${showChatMobile ? "show-mobile" : ""}`}>
         {selectedGroupId ? (
           <GroupDetails
             groupId={selectedGroupId}
             onBack={() => setShowChatMobile(false)}
             onOpenInfo={() => setShowGroupInfo(true)}
+            onExpenseCreated={fetchGroups}
           />
         ) : (
           <div className="group-loading">Loading group…</div>
         )}
       </div>
 
+      {/* INFO */}
       <div className={`groups-info ${showGroupInfo ? "show-info" : ""}`}>
         {showGroupInfo && selectedGroupId && (
           <GroupInfo
