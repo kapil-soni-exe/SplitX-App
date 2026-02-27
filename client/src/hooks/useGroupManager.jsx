@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useState,useEffect } from "react";
 import { useGroups } from "./useCreateGroup";
 
 export function useGroupManager() {
@@ -7,46 +7,32 @@ export function useGroupManager() {
   const [groups, setGroups] = useState([]);
   const [selectedGroupId, setSelectedGroupId] = useState(null);
 
-  // fetch groups once
-  useEffect(() => {
-    const load = async () => {
-      try {
-        const data = await getGroups();
-        setGroups(data);
-      } catch (err) {
-        console.error(err.message);
-      }
-    };
+  const fetchGroups = async () => {
+    const data = await getGroups();
+    setGroups(data);
+    return data;
+  };
 
-    load();
+  useEffect(() => {
+    fetchGroups();
   }, []);
 
-  // auto select first group
-  useEffect(() => {
-    if (!selectedGroupId && groups.length > 0) {
-      setSelectedGroupId(groups[0]._id);
-    }
-  }, [groups]);
-
-
-  // click select
   const selectGroup = (id) => {
     setSelectedGroupId(id);
   };
 
-  // create group
-  const addGroup = (newGroup) => {
-    setGroups((prev) => [newGroup, ...prev]);
-    setSelectedGroupId(newGroup._id);
-
+  // ⭐ ONLY IMPORTANT PART
+  const addGroup = async (groupId) => {
+    await fetchGroups();
+    setSelectedGroupId(groupId); // 👈 AUTO OPEN
+    console.log("AUTO OPEN ID:", groupId);
   };
-
 
   return {
     groups,
     selectedGroupId,
     selectGroup,
     addGroup,
-    setGroups, // optional
+    fetchGroups,
   };
 }
