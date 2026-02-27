@@ -1,42 +1,24 @@
-import { sortByDate,formatTime  } from "./dateHelper"
+import { formatTime } from "./dateHelper";
 import { activityFormatter } from "./activityFormatter";
 
 
-export function getLastExpense(group){
-  if (!group.expenses || group.expenses.length === 0) return null;
 
-    const copy=[...group.expenses]
-    
-  sortByDate(copy)
-  return copy[copy.length-1]
+export function getLastActivity(group, userId) {
+ 
+
+  const lastExpense = group?.lastExpense;
+
+  if (!lastExpense) return "";
+
+  return activityFormatter(lastExpense, userId);
 }
 
-export function getLastActivity(group,userId){
-  const lastExpense=getLastExpense(group)
-  
-  if(!lastExpense){
-    return ""
-  }
-  
-  const str = activityFormatter(lastExpense,group,userId)
-
-  return str
-
-}
-
-export function getLastActivityTime(group){
-
-const lastExpense=getLastExpense(group)
-  
-  if(!lastExpense){
-    return ""
-  }
-  const date= lastExpense.createdAt
+export function getLastActivityTime(group) {
+  const lastExpense = group?.lastExpense;
 
   
-  const time=formatTime(date)
 
-  return ` ${time}`
+  if (!lastExpense) return "";
 
-
+  return formatTime(lastExpense.createdAt);
 }
