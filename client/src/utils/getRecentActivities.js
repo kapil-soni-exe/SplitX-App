@@ -1,16 +1,21 @@
-export function getRecentActivities(groups) {
+export function getRecentActivities(groups = []) {
+  if (!Array.isArray(groups)) return [];
+
   const activities = [];
 
   groups.forEach((group) => {
+    if (!Array.isArray(group.expenses)) return;
+
     group.expenses.forEach((expense) => {
-      const payer = group.members.find(
-        (m) => m.id === expense.paidBy
+      const payer = group.members?.find(
+        (m) =>
+          m._id?.toString() === expense.paidBy?.toString()
       );
 
       activities.push({
-         id: `activity-${expense.id}`,
+        id: `activity-${expense._id}`,
 
-        name: payer.name,
+        name: payer?.name || "Someone",
         title: expense.title,
         groupName: group.name,
         amount: expense.amount,
@@ -20,7 +25,7 @@ export function getRecentActivities(groups) {
     });
   });
 
-  return activities.sort(
-    (a, b) => new Date(b.createdAt) - new Date(a.createdAt)
-  );
+  return activities
+    .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))
+    .slice(0, 10); // 🔥 limit for dashboard
 }
