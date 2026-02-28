@@ -1,68 +1,88 @@
 import React from "react";
 import "./GroupSummary.css";
 import { RiArrowDownSLine } from "@remixicon/react";
-import { getTotalSpent,getUserPaid,getUserShare } from "../../../../utils/calculation/calculation";
 import DonutChart from "./DonutChart";
 
+function GroupSummary({
+  groups = [],
+  selectedGroupId,
+  onGroupChange,
 
-function GroupSummary({groups,currentUserId}) {
-
- const totalspent = getTotalSpent(groups)
- const UserPaid = getUserPaid(groups,currentUserId)
- const UserShare=getUserShare(groups,currentUserId)
-console.log(getUserShare(groups,currentUserId))
-    
+  groupName,
+  totalSpent,
+  userPaid,
+  userShare,
+  expensesCount,
+}) {
   return (
     <div className="group-summary">
       {/* Header */}
       <div className="gs-header">
         <div>
           <h2 className="gs-title">Group Summary</h2>
-          <p className="gs-subtitle">{groups.name}</p>
+          <p className="gs-subtitle">{groupName}</p>
         </div>
-        <button className="gs-dropdown">
-          {}
-          <span>
-            <RiArrowDownSLine size={22} />
-          </span>
-        </button>
+
+        {/* DROPDOWN */}
+        <div className="gs-dropdown-wrapper">
+          <select
+            className="gs-dropdown"
+            value={selectedGroupId}
+            onChange={(e) => onGroupChange(e.target.value)}
+          >
+            {groups.map((group) => (
+              <option key={group._id} value={group._id}>
+                {group.name}
+              </option>
+            ))}
+          </select>
+          <RiArrowDownSLine size={22} className="gs-dropdown-icon" />
+        </div>
       </div>
+
       {/* Main */}
       <div className="gs-main">
         <div className="ring-wrap">
-            <div className="gs-ring">
-    <DonutChart
-      total={totalspent}
-      paid={UserPaid}
-      share={UserShare}
-    />
-  </div>
+          <div className="gs-ring">
+            <DonutChart
+              total={totalSpent}
+              paid={userPaid}
+              share={userShare}
+            />
+          </div>
+
           <div className="gs-ring-center">
             <p className="ring-label">TOTAL SPENT</p>
-            <h2 className="ring-value">{totalspent}</h2>
+            <h2 className="ring-value">₹{totalSpent}</h2>
           </div>
         </div>
 
-        {/* Side States */}
+        {/* Side Stats */}
         <div className="gs-stats">
           <div className="gs-stat">
             <span>You Paid</span>
-            <strong>{UserPaid}</strong>
+            <strong>₹{userPaid}</strong>
           </div>
           <div className="gs-stat">
             <span>Your Share</span>
-            <strong>{UserShare}</strong>
+            <strong>₹{userShare}</strong>
           </div>
-          <div className="gs-stat highlight positive">{UserPaid - UserShare}</div>
+
+          <div
+            className={`gs-stat highlight ${
+              userPaid - userShare >= 0 ? "positive" : "negative"
+            }`}
+          >
+            ₹{userPaid - userShare}
+          </div>
         </div>
       </div>
-        
 
-        <div className="gs-footer">
-          <span>{groups.expenses.length} expenses</span>
-          <span>Update Today</span>
-        </div>
-      
+      {/* Footer */}
+      <div className="gs-footer">
+        <span>{expensesCount} expenses</span>
+        <span>Updated today</span>
+      </div>
     </div>
   );
 }

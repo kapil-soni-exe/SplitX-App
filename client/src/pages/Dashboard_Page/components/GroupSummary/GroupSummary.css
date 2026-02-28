@@ -21,20 +21,43 @@
   margin-top: 5px;
   color: var(--text-secondary);
 }
+.gs-dropdown-wrapper {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+}
+
 .gs-dropdown {
+  appearance: none;          /* 🔥 native arrow hide */
+  -webkit-appearance: none;
+  -moz-appearance: none;
+
   background-color: transparent;
-  padding: 0.4rem 0.8rem;
+  padding: 0.4rem 2rem 0.4rem 0.8rem; /* right space for icon */
   border-radius: 999px;
   border: 1px solid var(--border);
-  display: flex;
-  align-items: center;
-  gap: 5px;
+
   color: var(--text-primary);
   font-size: 0.85rem;
   cursor: pointer;
+
+  display: inline-flex;
+  align-items: center;
 }
-.gs-dropdown span {
-  display: flex;
+
+.gs-dropdown option {
+  background-color: var(--bg-secondary);
+  color: var(--text-primary);
+  padding: 10px;
+  font-size: 0.9rem;
+}
+
+/* Arrow icon */
+.gs-dropdown-icon {
+  position: absolute;
+  right: 0.6rem;
+  pointer-events: none;
+  color: var(--text-secondary);
 }
 
 .gs-main {

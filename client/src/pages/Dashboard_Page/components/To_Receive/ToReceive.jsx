@@ -1,42 +1,43 @@
-import React from 'react'
-import { getReceiveList } from '../../../../utils/calculation/toreceive'
-import "./ToReceive.css"
-import { RiArrowRightSLine } from '@remixicon/react'
+import React from "react";
+import "./ToReceive.css";
+import { RiArrowRightSLine } from "@remixicon/react";
 
-
-function ToReceive({groups,currentUserId}) {
-  const ReceiveList= getReceiveList(groups,currentUserId)
-  const total = ReceiveList.reduce(
+function ToReceive({ receiveList = [] }) {
+  const total = receiveList.reduce(
     (sum, item) => sum + item.amount,
     0
   );
+
   return (
     <div className="receive-card">
       <div className="receive-header">
-          <h3>You Will Receive</h3>
+        <h3>You Will Receive</h3>
         <p>In this group</p>
       </div>
 
       <div className="receive-body">
-        {ReceiveList.length ===0 ? (
-          <div className='receive-empty'>
+        {receiveList.length === 0 ? (
+          <div className="receive-empty">
             🎉 Nothing to collect here!
           </div>
-        ):(
-          ReceiveList.map((person)=>(
+        ) : (
+          receiveList.map((person) => (
             <div
-            key={person.userId}
-            className='receive-row'
+              key={person.userId}
+              className="receive-row"
             >
               <div className="receive-left">
                 <div className="receive-avatar">
-                  {person.name[0]}
+                  {person.name?.[0]}
                 </div>
-                <span className='receive-name'> {person.name}</span>
+                <span className="receive-name">
+                  {person.name}
+                </span>
               </div>
+
               <div className="receive-right">
                 <span className="receive-amount">
-                   ₹{person.amount}
+                  ₹{person.amount}
                 </span>
                 <RiArrowRightSLine size={20} />
               </div>
@@ -44,7 +45,8 @@ function ToReceive({groups,currentUserId}) {
           ))
         )}
       </div>
-      {ReceiveList.length > 0 && (
+
+      {receiveList.length > 0 && (
         <div className="receive-footer">
           <div className="receive-total">
             <span>Total to Receive</span>
@@ -57,7 +59,7 @@ function ToReceive({groups,currentUserId}) {
         </div>
       )}
     </div>
-  )
+  );
 }
 
-export default ToReceive
+export default ToReceive;

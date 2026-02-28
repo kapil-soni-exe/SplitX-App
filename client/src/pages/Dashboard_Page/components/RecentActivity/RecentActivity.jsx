@@ -5,7 +5,7 @@ import "./Activites.css"
 function RecentActivity({groups}) {
 
 const activities = getRecentActivities(groups)
-// console.log("groups:", groups);
+console.log("groups:", groups);
 
 
   console.log(activities)
