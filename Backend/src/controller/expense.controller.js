@@ -36,12 +36,6 @@ const getExpensesByGroup = async (req, res) => {
       .populate("paidBy", "name")
       .populate("splits.userId", "name")
       .sort({ expenseDate: -1, createdAt: -1 });
-    console.log(
-      expenses.map((e) => ({
-        paidBy: e.paidBy,
-        splits: e.splits,
-      })),
-    );
 
     return res.status(200).json({
       success: true,
