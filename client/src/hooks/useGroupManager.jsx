@@ -10,6 +10,9 @@ export function useGroupManager() {
   const fetchGroups = async () => {
     const data = await getGroups();
     setGroups(data);
+    if (data.length > 0 && !selectedGroupId) {
+    setSelectedGroupId(data[0].id);
+  }
     return data;
   };
 

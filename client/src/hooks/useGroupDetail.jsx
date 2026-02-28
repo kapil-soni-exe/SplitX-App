@@ -7,11 +7,15 @@ export function useGroupDetail(groupId) {
   const [error, setError] = useState(null);
 
   useEffect(() => {
-    if (!groupId) return;
+    if (!groupId){
+      setLoading(false)
+      return
+    }
 
     const loadGroup = async () => {
       try {
         setLoading(true);
+        setError(null);
         const res = await FetchGroupbyId(groupId);
         setGroup(res.data.data);
       } catch (err) {
