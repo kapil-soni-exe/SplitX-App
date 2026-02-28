@@ -8,6 +8,7 @@ import Dashboard from "../pages/Dashboard_Page/Dashboard";
 import Group from "../pages/Group_Page/Group";
 import InviteCheck from "../pages/Group_Page/components/GroupList/InviteCheck";
 import ProtectedRoute from "../components/ProtectedRoute";
+import ExpensesPage from "../pages/Expense_page/ExpensesPage";
 
 export const router = createBrowserRouter([
   {
@@ -40,10 +41,21 @@ export const router = createBrowserRouter([
           <Group/>
         </ProtectedRoute>
       ) },
+
+      {
+        path: "expenses",
+        element: (
+        <ProtectedRoute>
+          <ExpensesPage />
+        </ProtectedRoute>
+        ),
+      },
     ],
   },
   {
     path:"/invite/:inviteCode",
     element:<InviteCheck/>
-  }
+  },
+ 
+
 ]);
