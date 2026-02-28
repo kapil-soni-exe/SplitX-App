@@ -1,5 +1,13 @@
 const Group = require("../models/group.model");
 const crypto = require("crypto");
+const {
+  getGroupTotalSpent,
+  getUserPaid,
+  getUserShare,
+  getPayList,
+  getReceiveList,
+  getExpensesCount,
+} = require("../services/groups.service");
 
 //Create Group
 const generateInviteCode = () => {
@@ -99,7 +107,8 @@ const getGroupbyId = async (req, res) => {
       isArchived: false,
     })
       .populate("members", "name email avatar")
-      .populate("createdBy", "name email");
+      .populate("createdBy", "name email")
+      .lean();
 
     //  access control
     if (!group) {
@@ -109,10 +118,33 @@ const getGroupbyId = async (req, res) => {
       });
     }
 
+    const [totalSpent, userPaid, userShare, payList, receiveList,expenseCount] =
+      await Promise.all([
+        getGroupTotalSpent(group._id),
+        getUserPaid(group._id, userId),
+        getUserShare(group._id, userId),
+        getPayList(group._id, userId),
+        getReceiveList(group._id, userId),
+        getExpensesCount(group._id)
+      ]);
+
+    const netBalance = userPaid - userShare;
+
+    
+
     // success response
     return res.status(200).json({
       success: true,
-      data: group,
+      data: {
+        ...group,
+        totalSpent,
+        userPaid,
+        userShare,
+        netBalance,
+        payList,
+        receiveList,
+        expenseCount
+      },
     });
   } catch (err) {
     console.error("Get group by id error:", err);
@@ -184,8 +216,7 @@ const joinGroup = async (req, res) => {
     group.members.push(userId);
     await group.save();
 
-    console.log("JOIN USER:", req.user.id);
-    console.log("GROUP:", group._id);
+    
 
     return res.json({
       success: true,
@@ -205,5 +236,5 @@ module.exports = {
   getAllgroup,
   getGroupbyId,
   CheckInviteCode,
-  joinGroup
+  joinGroup,
 };
