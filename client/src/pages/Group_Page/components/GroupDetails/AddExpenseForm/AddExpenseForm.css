@@ -1,0 +1,258 @@
+/* ===============================
+   FORM LAYOUT
+================================ */
+
+.add-expense-form {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+
+  max-width: 560px;
+  width: 100%;
+  margin: 0 auto;
+}
+
+.form-title {
+  color: var(--accent);
+  font-size: 1.05rem;
+  margin-block: 4px;
+}
+
+/* ===============================
+   FORM ROWS
+================================ */
+
+.form-row {
+  display: flex;
+  gap: 10px;
+}
+
+.form-row .form-field {
+  flex: 1;
+}
+
+.form-field {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+label {
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: var(--text-secondary);
+}
+
+/* ===============================
+   INPUTS / DROPDOWN / TEXTAREA
+================================ */
+
+.form-dropdown {
+  padding: 8px 10px;
+  border-radius: 10px;
+
+  background: var(--bg-card);
+  color: var(--text-primary);
+
+  border: 1px solid var(--border);
+  font-size: 0.85rem;
+}
+
+.form-textarea {
+  padding: 8px 10px;
+  border-radius: 10px;
+
+  background: var(--bg-card);
+  color: var(--text-primary);
+
+  border: 1px solid var(--border);
+  font-size: 0.85rem;
+  resize: none;
+  max-height: 44px;
+  max-height: 44px;
+  overflow-y: auto;
+
+  resize: none;
+}
+
+.form-textarea::placeholder {
+  color: var(--text-secondary);
+}
+
+/* ===============================
+   SPLIT SECTION
+================================ */
+
+.split-section {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+/* Header */
+.split-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+
+  padding: 0.25rem 0.4rem;
+  border-bottom: 1px solid var(--border);
+}
+
+.split-header p {
+  margin: 0;
+  font-weight: 600;
+  font-size: 0.8rem;
+  color: var(--text-secondary);
+}
+
+/* ===============================
+   SPLIT TYPE TOGGLE
+================================ */
+
+.split-type-inline {
+  display: inline-flex;
+  align-items: center;
+
+  background: var(--bg-main);
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  padding: 2px;
+  gap: 2px;
+
+  font-size: 0.7rem;
+}
+
+.split-option {
+  padding: 4px 10px;
+  border-radius: 999px;
+  cursor: pointer;
+
+  color: var(--text-secondary);
+  font-weight: 500;
+
+  transition: background-color 0.18s ease,
+              color 0.18s ease;
+}
+
+.split-option.active {
+  background: var(--accent);
+  color: #fff;
+  font-weight: 600;
+}
+
+/* ===============================
+   SPLIT LIST (SCROLL AREA)
+================================ */
+
+.split-list {
+  max-height: 160px;              /* height control */
+  overflow-y: auto;
+
+  padding: 6px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+
+  color: var(--text-secondary);
+}
+
+/* Scrollbar */
+.split-list::-webkit-scrollbar {
+  width: 6px;
+}
+.split-list::-webkit-scrollbar-thumb {
+  background: var(--interactive-bg);
+  border-radius: 10px;
+}
+.split-list::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+/* ===============================
+   SPLIT ROW (CHECKBOX + NAME + AMOUNT)
+================================ */
+
+.split-checkbox {
+  display: grid;
+  grid-template-columns: auto 1fr auto; /* checkbox | name | amount */
+  align-items: center;
+  gap: 8px;
+
+  padding: 6px 8px;
+  border-radius: 8px;
+  cursor: pointer;
+
+  transition: background 0.15s ease;
+}
+
+.split-checkbox:hover {
+  background: var(--bg-main);
+}
+
+/* Checkbox */
+.split-checkbox input[type="checkbox"] {
+  width: 16px;
+  height: 16px;
+  cursor: pointer;
+  accent-color: var(--accent);
+}
+
+/* Member name */
+.member-name {
+  font-size: 0.9rem;
+  color: var(--text-primary);
+
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* Equal split amount */
+.member-amount {
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--text-secondary);
+}
+
+/* Unequal amount input */
+.split-amount-input {
+  width: 65px;
+  padding: 3px 6px;
+  border-radius: 6px;
+
+  border: 1px solid var(--border);
+  background: var(--bg-main);
+  color: var(--text-primary);
+
+  font-size: 0.85rem;
+}
+
+/* ===============================
+   PAID BY HIGHLIGHT
+================================ */
+
+.split-checkbox.paid-by {
+  background: rgba(0, 200, 120, 0.08);
+}
+
+.split-checkbox.paid-by:hover {
+  background: rgba(0, 200, 120, 0.12);
+}
+
+.paid-by-badge {
+  margin-left: 6px;
+  padding: 3px 6px;
+
+  font-size: 0.65rem;
+  font-weight: 600;
+
+  border-radius: 999px;
+  background: rgba(0, 200, 120, 0.15);
+  color: #00a86b;
+}
+
+/* ===============================
+   MOBILE SAFETY
+================================ */
+
