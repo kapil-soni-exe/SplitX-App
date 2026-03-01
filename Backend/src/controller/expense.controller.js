@@ -1,5 +1,5 @@
 const Expense = require("../models/expense.model");
-const expenseService = require("../services/expense.service");
+const expenseService = require("../services/Expenses/index");
 // Create Expenses
 const createExpense = async (req, res) => {
   try {
@@ -10,9 +10,9 @@ const createExpense = async (req, res) => {
     });
   } catch (error) {
     console.error("Create expense error:", error);
-    return res.status(500).json({
+    return res.status(error.statusCode || 500).json({
       success: false,
-      message: "Failed to create expense",
+      message: error.message || "Failed to create expense",
     });
   }
 };
@@ -29,23 +29,16 @@ const getExpensesByGroup = async (req, res) => {
       });
     }
 
-    const expenses = await Expense.find({
-      groupId,
-      deletedAt: null,
-    })
-      .populate("paidBy", "name")
-      .populate("splits.userId", "name")
-      .sort({ expenseDate: -1, createdAt: -1 });
+    const expenses = await expenseService.getExpensesByGroup(groupId, req.user);
 
     return res.status(200).json({
       success: true,
       expenses,
     });
   } catch (error) {
-    console.error("Get expenses error:", error);
-    return res.status(500).json({
+    return res.status(error.statusCode || 500).json({
       success: false,
-      message: "Failed to fetch expenses",
+      message: error.message || "Failed to fetch expenses",
     });
   }
 };
