@@ -12,7 +12,13 @@ import CreateGroup from "../GroupList/CreateGroup";
 import { useCreateGroup } from "../../../../hooks/useCreateGroup";
 import InviteLink from "../GroupList/InviteLink";
 
-function GroupList({ groups, selectedGroupId, onSelectGroup, onGroupCreated }) {
+function GroupList({
+  groups,
+  selectedGroupId,
+  onSelectGroup,
+  onGroupCreated,
+  currentUser,
+}) {
   const { create } = useCreateGroup();
   const [search, setSearch] = useState("");
   const [open, setOpen] = useState(false);
@@ -23,11 +29,13 @@ function GroupList({ groups, selectedGroupId, onSelectGroup, onGroupCreated }) {
   const handleCreateGroup = async (name) => {
     try {
       const { group, inviteLink } = await create(name);
+       
 
       setCreatedGroup(group);
       setInviteLink(inviteLink);
 
-      onGroupCreated(group);
+      onGroupCreated(group._id);
+      onSelectGroup(group._id)
     } catch (err) {
       console.error(err.message);
     }
@@ -71,6 +79,15 @@ function GroupList({ groups, selectedGroupId, onSelectGroup, onGroupCreated }) {
         {visibleSearch.map((group) => {
           const isActive = group._id === selectedGroupId;
 
+          console.log("🧪 GROUP LIST ACTIVITY DEBUG", {
+            lastExpense: group.lastExpense,
+            paidById:
+              typeof group.lastExpense?.paidBy === "string"
+                ? group.lastExpense?.paidBy
+                : group.lastExpense?.paidBy?._id,
+            currentUserId: currentUser?._id || currentUser?.id,
+          });
+
           return (
             <div
               key={group._id}
@@ -84,7 +101,9 @@ function GroupList({ groups, selectedGroupId, onSelectGroup, onGroupCreated }) {
 
                 <span className="group-meta">
                   <span className="group-preview-text">
-                    {getLastActivity(group, "u1") || "No activity yet"}
+                     {group.lastExpense
+    ? getLastActivity(group, currentUser?.id)
+    : "No activity yet"}
                   </span>
                   <span className="group-last-time">
                     {getLastActivityTime(group)}
