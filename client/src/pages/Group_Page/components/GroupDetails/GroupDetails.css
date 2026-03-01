@@ -168,6 +168,10 @@
   cursor: pointer;
   color: var(--text-primary);
 }
+.chat-note{
+  color: var(--text-secondary);
+  font-style: italic;
+}
 
 @media (max-width: 768px) {
 

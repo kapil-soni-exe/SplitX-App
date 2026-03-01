@@ -1,28 +1,66 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import "./GroupDetails.css";
 import { getDayLabel, sortByDate, formatTime } from "../../utils/dateHelper";
 import { activityFormatter } from "../../utils/activityFormatter";
 import { RiArrowLeftCircleLine } from "@remixicon/react";
 import Model from "../../../../components/comman/Model";
-import AddExpenseForm from "./AddExpenseForm";
+import AddExpenseForm from "./AddExpenseForm/AddExpenseForm";
 import { useGroupDetail } from "../../../../hooks/useGroupDetail";
 import { useAuth } from "../../../../context/AuthContext";
+import ExpenseDetail from "./ExpenseDetail";
+import {
+  createExpense,
+  fetchExpensesByGroup,
+} from "../../../../../api/expense.api";
 
-function GroupDetails({ groupId, onBack, onOpenInfo }) {
+
+import GroupSummaryStrip from "./GroupSummaryStrip";
+
+function GroupDetails({ groupId, onBack, onOpenInfo, onExpenseCreated }) {
   const [open, setOpen] = useState(false);
-  const { user } = useAuth();
+  const [expenses, setExpenses] = useState([]); // ✅ hook on top
+  const [selectedExpense, setSelectedExpense] = useState(null);
 
+  const { user } = useAuth();
   const { group, loading } = useGroupDetail(groupId);
 
-  const handleAddExpense = (newExpense) => {
-    console.log("NEW EXPENSE:", newExpense);
+  // 🔹 fetch expenses
+  useEffect(() => {
+    if (!groupId) return;
 
-    // abhi sirf verify kar rahe
-    // later yahin API call hogi
+    const loadExpenses = async () => {
+      try {
+        const res = await fetchExpensesByGroup(groupId);
+        setExpenses(res.data.expenses);
+      } catch (err) {
+        console.error("Fetch expenses failed:", err);
+      }
+    };
 
+    loadExpenses();
+  }, [groupId]);
+
+  // 🔹 create expense
+  const handleAddExpense = async (expenseData) => {
     setOpen(false);
+
+    try {
+      await createExpense(expenseData);
+
+      await onExpenseCreated();
+
+      // re-fetch expenses
+      const res = await fetchExpensesByGroup(groupId);
+      setExpenses(res.data.expenses);
+    } catch (err) {
+      console.error(
+        "Create expense failed:",
+        err.response?.data || err.message,
+      );
+    }
   };
 
+  // conditional returns AFTER hooks
   if (loading) {
     return <div className="group-loading">Loading group…</div>;
   }
@@ -31,9 +69,7 @@ function GroupDetails({ groupId, onBack, onOpenInfo }) {
     return <div className="group-detail-empty">Group not found</div>;
   }
 
-  const expenses = group.expenses ?? [];
   const sortedExpenses = sortByDate(expenses);
-
   let lastLabel = null;
 
   return (
@@ -48,18 +84,16 @@ function GroupDetails({ groupId, onBack, onOpenInfo }) {
           <span>{group.members?.length || 0} members</span>
         </div>
       </div>
+      <GroupSummaryStrip />
 
       {/* CHAT BODY */}
-
       <div className="group-chat-body">
         {sortedExpenses.map((expense) => {
           const label = getDayLabel(expense.createdAt);
-
           const showLabel = label !== lastLabel;
-
           lastLabel = label;
 
-          const isOutgoing = expense.paidBy?._id === user?._id;
+          const isOutgoing = expense.paidBy?._id === user?.id;
 
           return (
             <React.Fragment key={expense._id}>
@@ -69,15 +103,27 @@ function GroupDetails({ groupId, onBack, onOpenInfo }) {
                 className={`chat-message ${
                   isOutgoing ? "outgoing" : "incoming"
                 }`}
+                onClick={() => setSelectedExpense(expense)}
               >
-                <p>{activityFormatter(expense, group, user)}</p>
-
+                <p>{activityFormatter(expense,user?._id || user?.id)}</p>
+                {expense.note && <p className="chat-note">{expense.note}</p>}
                 <span>{formatTime(expense.createdAt)}</span>
               </div>
             </React.Fragment>
           );
         })}
       </div>
+      <Model
+        isOpen={!!selectedExpense}
+        onClose={() => setSelectedExpense(null)}
+      >
+        <ExpenseDetail
+          expense={selectedExpense}
+          currentUser={user}
+          onEdit={(exp) => console.log("Edit", exp)}
+          onDelete={(exp) => console.log("Delete", exp)}
+        />
+      </Model>
 
       {/* FOOTER */}
       <div className="group-chat-footer">
@@ -86,6 +132,7 @@ function GroupDetails({ groupId, onBack, onOpenInfo }) {
         <button className="chat-primary-btn" onClick={() => setOpen(true)}>
           Add Expense
         </button>
+
         <Model isOpen={open} onClose={() => setOpen(false)}>
           <AddExpenseForm
             members={group.members}
