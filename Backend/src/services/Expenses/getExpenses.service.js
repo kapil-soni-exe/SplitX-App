@@ -18,10 +18,11 @@ const getExpensesByGroup = async (groupId, user) => {
 
   const expenses = await Expense.find({
     groupId,
-    deletedAt: null,
   })
     .populate("paidBy", "name")
     .populate("splits.userId", "name")
+    .populate("deletedBy", "name")
+     .populate("createdBy", "name")
     .sort({ expenseDate: -1, createdAt: -1 });
 
   return expenses;
