@@ -13,7 +13,7 @@ const splitSchema = new mongoose.Schema(
       type: Number,
     },
   },
-  { _id: false }
+  { _id: false },
 );
 
 const expenseSchema = new mongoose.Schema(
@@ -57,10 +57,7 @@ const expenseSchema = new mongoose.Schema(
     splits: {
       type: [splitSchema],
       required: true,
-      validate: [
-        (v) => v.length > 0,
-        "At least one split is required",
-      ],
+      validate: [(v) => v.length > 0, "At least one split is required"],
     },
 
     expenseDate: {
@@ -74,12 +71,23 @@ const expenseSchema = new mongoose.Schema(
       required: true,
     },
 
-    deletedAt: {
+     deletedAt: {
+      type: Date,
+      default: null,
+    },
+
+    deletedBy: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "User",
+      default: null,
+    },
+
+    editedAt: {
       type: Date,
       default: null,
     },
   },
-  { timestamps: true }
+  { timestamps: true },
 );
 
 module.exports = mongoose.model("Expense", expenseSchema);
