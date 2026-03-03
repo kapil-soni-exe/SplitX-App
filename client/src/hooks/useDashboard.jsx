@@ -1,6 +1,6 @@
 // hooks/useDashboard.js
-import { useEffect, useState } from "react";
-import { FetchGroupbyId,fetchGroups } from "../../api/group.api";
+import { useEffect, useState, useCallback } from "react";
+import { FetchGroupbyId, fetchGroups } from "../../api/group.api";
 
 export function useDashboard() {
   const [groups, setGroups] = useState([]);
@@ -8,6 +8,19 @@ export function useDashboard() {
   const [group, setGroup] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+
+  // Load group detail (reusable)
+  const loadGroup = useCallback(async (groupId) => {
+    try {
+      
+      const res = await FetchGroupbyId(groupId);
+      setGroup(res.data.data);
+    } catch (err) {
+      setError(err);
+    } finally {
+      setLoading(false);
+    }
+  }, []);
 
   // 1️⃣ load groups & auto-select first
   useEffect(() => {
@@ -18,7 +31,7 @@ export function useDashboard() {
         setGroups(list);
 
         if (list.length > 0) {
-          setSelectedGroupId(list[0]._id); // ✅ AUTO SELECT
+          setSelectedGroupId(list[0]._id);
         } else {
           setLoading(false);
         }
@@ -33,21 +46,8 @@ export function useDashboard() {
   // 2️⃣ load selected group detail
   useEffect(() => {
     if (!selectedGroupId) return;
-
-    async function loadGroup() {
-      try {
-        setLoading(true);
-        const res = await FetchGroupbyId(selectedGroupId);
-        setGroup(res.data.data);
-      } catch (err) {
-        setError(err);
-      } finally {
-        setLoading(false);
-      }
-    }
-
-    loadGroup();
-  }, [selectedGroupId]);
+    loadGroup(selectedGroupId);
+  }, [selectedGroupId, loadGroup]);
 
   return {
     groups,
@@ -56,5 +56,6 @@ export function useDashboard() {
     group,
     loading,
     error,
+    refreshGroup: () => loadGroup(selectedGroupId), // 🔥 NEW
   };
 }
