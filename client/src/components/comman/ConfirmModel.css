@@ -1,0 +1,28 @@
+.confirm-modal {
+  padding: 1rem;
+  max-width: 320px;
+}
+.confirm-modal h3{
+    color: var(--accent);
+}
+
+.confirm-modal p {
+  font-size: 0.75rem;
+  color: var(--text-muted);
+  margin: 0.6rem 0 1rem;
+}
+
+.confirm-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.6rem;
+  
+}
+
+.chat-primary-btn.danger {
+  background: #e54848;
+}
+.chat-secondary-btn{
+    color: var(--text-secondary);
+    
+}
