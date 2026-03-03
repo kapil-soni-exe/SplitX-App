@@ -1,8 +1,7 @@
 import {
   RiHome5Fill,
   RiTeamFill,
-  RiMoneyRupeeCircleFill,
-  RiExchangeFill,
+  RiNotification3Fill,
   RiUser3Fill
 } from "@remixicon/react";
 
@@ -18,16 +17,11 @@ export const mobileNavItem = [
     icon: RiTeamFill,
   },
   {
-    label: "Expenses",
-    path: "/expenses",
-    icon: RiMoneyRupeeCircleFill,
+    label: "Alerts",
+    path: "/notifications",
+    icon: RiNotification3Fill,
   },
   {
-    label: "Settle",
-    path: "/settlements",
-    icon: RiExchangeFill,
-  },
-   {
     label: "Profile",
     path: "/profile",
     icon: RiUser3Fill,
