@@ -28,5 +28,5 @@ export function useGroupDetail(groupId) {
     loadGroup();
   }, [groupId]);
 
-  return { group, loading, error };
+  return { group, loading, error, };
 }
