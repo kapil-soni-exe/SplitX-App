@@ -1,5 +1,6 @@
 const Group = require("../models/group.model");
 const crypto = require("crypto");
+
 const {
   getGroupTotalSpent,
   getUserPaid,
@@ -7,16 +8,23 @@ const {
   getPayList,
   getReceiveList,
   getExpensesCount,
+  getUserNetBalance,
 } = require("../services/groups.service");
 
-//Create Group
+/* 
+   Utility: Generate random invite code for groups
+ */
 const generateInviteCode = () => {
   return crypto.randomBytes(4).toString("hex");
 };
 
+/* 
+   Create Group
+ */
 const createGroup = async (req, res) => {
   try {
     const { name } = req.body;
+
     if (!name) {
       return res.status(400).json({
         success: false,
@@ -32,17 +40,24 @@ const createGroup = async (req, res) => {
         message: "creator userId required",
       });
     }
-    //  Generate Invite Code
+
+    // Generate unique invite code
     let inviteCode;
+
     for (let i = 0; i < 5; i++) {
       inviteCode = generateInviteCode();
       const exists = await Group.findOne({ inviteCode });
       if (!exists) break;
     }
+
     const group = await Group.create({
       name,
       createdBy,
-      members: [createdBy],
+      members: [
+        {
+          userId: createdBy,
+        },
+      ],
       inviteCode,
     });
 
@@ -64,15 +79,19 @@ const createGroup = async (req, res) => {
   }
 };
 
-// Fetch Group
+/* 
+   Fetch all groups where user is a member
+ */
 const getAllgroup = async (req, res) => {
   try {
     const userId = req.user.id;
+
     const groups = await Group.find({
-      members: userId,
+      "members.userId": userId,
       isArchived: false,
     })
-      .populate("members", "name email avatar")
+      // Populate user details inside members.userId
+      .populate("members.userId", "name email avatar")
       .populate("createdBy", "name email");
 
     res.status(200).json({
@@ -89,28 +108,24 @@ const getAllgroup = async (req, res) => {
   }
 };
 
-// Get Group by id
-
+/*
+   Get single group by ID */
 const getGroupbyId = async (req, res) => {
   try {
     const { groupId } = req.params;
     const userId = req.user.id;
 
-    //  find group where:
-    // - id matches
-    // - user is member
-    // - group not archived
-
+    // Access control:
+    // user must be member of the group
     const group = await Group.findOne({
       _id: groupId,
-      members: userId,
+      "members.userId": userId,
       isArchived: false,
     })
-      .populate("members", "name email avatar")
+      .populate("members.userId", "name email avatar")
       .populate("createdBy", "name email")
       .lean();
 
-    //  access control
     if (!group) {
       return res.status(404).json({
         success: false,
@@ -118,21 +133,33 @@ const getGroupbyId = async (req, res) => {
       });
     }
 
-    const [totalSpent, userPaid, userShare, payList, receiveList,expenseCount] =
-      await Promise.all([
-        getGroupTotalSpent(group._id),
-        getUserPaid(group._id, userId),
-        getUserShare(group._id, userId),
-        getPayList(group._id, userId),
-        getReceiveList(group._id, userId),
-        getExpensesCount(group._id)
-      ]);
+    // Fetch financial summary in parallel
+    const [
+      totalSpent,
+      userPaid,
+      userShare,
+      payList,
+      receiveList,
+      expenseCount,
+    ] = await Promise.all([
+      getGroupTotalSpent(group._id),
+      getUserPaid(group._id, userId),
+      getUserShare(group._id, userId),
+      getPayList(group._id, userId),
+      getReceiveList(group._id, userId),
+      getExpensesCount(group._id),
+    ]);
 
-    const netBalance = userPaid - userShare;
+    let netBalance = 0;
 
-    
+    if (payList.length > 0) {
+      netBalance = -payList.reduce((sum, p) => sum + p.amount, 0);
+    }
 
-    // success response
+    if (receiveList.length > 0) {
+      netBalance = receiveList.reduce((sum, r) => sum + r.amount, 0);
+    }
+
     return res.status(200).json({
       success: true,
       data: {
@@ -143,7 +170,7 @@ const getGroupbyId = async (req, res) => {
         netBalance,
         payList,
         receiveList,
-        expenseCount
+        expenseCount,
       },
     });
   } catch (err) {
@@ -156,15 +183,12 @@ const getGroupbyId = async (req, res) => {
   }
 };
 
-// Check Invite Code
 const CheckInviteCode = async (req, res) => {
   try {
     const { inviteCode } = req.params;
 
-    //group find by inviteCode
     const group = await Group.findOne({ inviteCode });
 
-    // If Group not Exists
     if (!group) {
       return res.status(404).json({
         success: false,
@@ -172,7 +196,6 @@ const CheckInviteCode = async (req, res) => {
       });
     }
 
-    // If Group found
     return res.status(200).json({
       success: true,
       data: {
@@ -182,7 +205,8 @@ const CheckInviteCode = async (req, res) => {
       },
     });
   } catch (err) {
-    console.error("Invite check error:", error);
+    console.error("Invite check error:", err);
+
     return res.status(500).json({
       success: false,
       message: "Server error",
@@ -190,7 +214,7 @@ const CheckInviteCode = async (req, res) => {
   }
 };
 
-// Join Group From ID
+/* Join Group using invite code */
 const joinGroup = async (req, res) => {
   try {
     const { inviteCode } = req.params;
@@ -205,28 +229,103 @@ const joinGroup = async (req, res) => {
       });
     }
 
-    // already member → just return group
-    if (group.members.some((m) => m.toString() === userId)) {
+    // Check if user already exists in members list
+    const alreadyMember = group.members.some(
+      (m) => m.userId.toString() === userId.toString(),
+    );
+
+    if (alreadyMember) {
       return res.json({
         success: true,
         data: group,
       });
     }
 
-    group.members.push(userId);
+    // Add new member with joinedAt timestamp
+    group.members.push({
+      userId,
+    });
+
     await group.save();
 
-    
+    // Populate before sending response
+    const populatedGroup = await Group.findById(group._id).populate(
+      "members.userId",
+      "name email avatar",
+    );
 
     return res.json({
       success: true,
-      data: group,
+      data: populatedGroup,
     });
   } catch (err) {
     console.error(err);
+
     res.status(500).json({
       success: false,
       message: "Join failed",
+    });
+  }
+};
+
+// Leave Group
+const leaveGroup = async (req, res) => {
+  try {
+    const { groupId } = req.params;
+    const userId = req.user.id;
+
+    const group = await Group.findById(groupId);
+
+    if (!group) {
+      return res.status(404).json({
+        success: false,
+        message: "Group not found",
+      });
+    }
+
+    // Check if user is member
+    const isMember = group.members.some((m) => m.userId.toString() === userId);
+
+    if (!isMember) {
+      return res.status(403).json({
+        success: false,
+        message: "You are not a member of this group",
+      });
+    }
+
+    // Check if user balance is settled
+    const balance = await getUserNetBalance(groupId, userId);
+    console.log("User balance:", balance);
+
+    if (balance !== 0) {
+      return res.status(400).json({
+        success: false,
+        message: "Please settle all balances before leaving the group",
+      });
+    }
+
+    // Remove member from group
+    group.members = group.members.filter((m) => m.userId.toString() !== userId);
+
+    // Add activity
+    group.activities.push({
+      type: "GROUP_LEAVE",
+      userId,
+      userName,
+    });
+
+    await group.save();
+
+    return res.status(200).json({
+      success: true,
+      message: "You left the group successfully",
+    });
+  } catch (error) {
+    console.error("Leave group error:", error);
+
+    res.status(500).json({
+      success: false,
+      message: "Failed to leave group",
     });
   }
 };
@@ -237,4 +336,5 @@ module.exports = {
   getGroupbyId,
   CheckInviteCode,
   joinGroup,
+  leaveGroup,
 };
