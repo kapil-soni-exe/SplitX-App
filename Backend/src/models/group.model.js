@@ -56,13 +56,20 @@ const groupSchema = new mongoose.Schema(
       required: true,
     },
 
-    members: [
-      {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: "User",
-        required: true,
-      },
-    ],
+   members: [
+  {
+    userId: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "User",
+      required: true,
+    },
+
+    joinedAt: {
+      type: Date,
+      default: Date.now,
+    },
+  },
+],
 
     currency: {
       type: String,
@@ -74,6 +81,28 @@ const groupSchema = new mongoose.Schema(
       type: Boolean,
       default: false,
     },
+    activities: [
+  {
+    type: {
+      type: String,
+      enum: ["GROUP_LEAVE"],
+      required: true
+    },
+
+    userId: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "User",
+      required: true
+    },
+
+    userName: String, 
+
+    createdAt: {
+      type: Date,
+      default: Date.now
+    }
+  }
+]
   },
   {
     timestamps: true,
