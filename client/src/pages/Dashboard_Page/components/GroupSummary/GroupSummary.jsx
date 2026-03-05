@@ -12,6 +12,7 @@ function GroupSummary({
   totalSpent,
   userPaid,
   userShare,
+  netBalance,
   expensesCount,
 }) {
   return (
@@ -47,7 +48,7 @@ function GroupSummary({
             <DonutChart
               total={totalSpent}
               paid={userPaid}
-              share={userShare}
+              netBalance={netBalance}
             />
           </div>
 
@@ -70,10 +71,10 @@ function GroupSummary({
 
           <div
             className={`gs-stat highlight ${
-              userPaid - userShare >= 0 ? "positive" : "negative"
+              netBalance > 0 ? "positive" : netBalance < 0 ? "negative" : ""
             }`}
           >
-            ₹{userPaid - userShare}
+            {netBalance === 0 ? "All Settled 🎉" : `₹${netBalance}`}
           </div>
         </div>
       </div>

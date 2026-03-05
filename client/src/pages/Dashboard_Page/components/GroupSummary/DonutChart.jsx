@@ -5,12 +5,12 @@ import {
   Tooltip,
 } from "recharts";
 
-function DonutChart({ total, paid, share }) {
-  const net = paid - share;
+function DonutChart({ total, paid, netBalance }) {
+  const net = netBalance;
 
   const data = [
     {
-      name: net >= 0 ? "You Get Back" : "You Need to Pay",
+      name: net > 0 ? "You Get Back" : "You Need to Pay",
       value: Math.abs(net),
     },
     {
@@ -20,7 +20,7 @@ function DonutChart({ total, paid, share }) {
   ];
 
   const COLORS = [
-    net >= 0 ? "#22c55e" : "#ef4444", // green or red
+    net > 0 ? "#22c55e" : net < 0 ? "#ef4444" : "#3C19E6",
     "#3C19E6",
   ];
 
@@ -36,13 +36,9 @@ function DonutChart({ total, paid, share }) {
         stroke="none"
       >
         {data.map((_, index) => (
-          <Cell
-            key={index}
-            fill={COLORS[index]}
-          />
+          <Cell key={index} fill={COLORS[index]} />
         ))}
       </Pie>
-
       <Tooltip />
     </PieChart>
   );
