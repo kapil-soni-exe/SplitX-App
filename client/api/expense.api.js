@@ -7,3 +7,13 @@ export const createExpense = (data) => {
 export const fetchExpensesByGroup = (groupId) => {
   return apiClient.get(`/expenses?groupId=${groupId}`);
 };
+
+//  Edit expense
+export const updateExpense = (expenseId, data) => {
+  return apiClient.patch(`/expenses/${expenseId}`, data);
+};
+
+// Delete Expense(Soft delete)
+export const deleteExpense =(expenseId)=>{
+  return apiClient.delete(`/expenses/${expenseId}`)
+}
