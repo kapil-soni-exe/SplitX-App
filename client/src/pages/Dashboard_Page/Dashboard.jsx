@@ -10,10 +10,19 @@ import InsightsCard from "./components/InsightsCard";
 import GroupSummary from "./components/GroupSummary/GroupSummary";
 
 import { useDashboard } from "../../hooks/useDashboard";
+import { useGroupSettlement } from "../../hooks/useGroupSettlement";
 
 function Dashboard() {
-  const { groups, selectedGroupId, setSelectedGroupId, group, loading, error } =
-    useDashboard();
+  const {
+    groups,
+    selectedGroupId,
+    setSelectedGroupId,
+    group,
+    loading,
+    error,
+    refreshGroup,
+  } = useDashboard();
+  const { handleCreateSettlement } = useGroupSettlement(selectedGroupId);
 
   if (loading) return <div>Loading dashboard...</div>;
   if (error) return <div>Something went wrong</div>;
@@ -30,7 +39,23 @@ function Dashboard() {
     expenseCount,
   } = group;
 
-  console.log("expenses:", expenseCount);
+  async function handleConfirmSettlement(selectedUsers) {
+    try {
+      for (let user of selectedUsers) {
+        await handleCreateSettlement({
+          to: user.userId,
+          amount: user.amount,
+          note: "Dashboard settlement",
+        });
+      }
+
+      console.log("Settlement successful");
+
+      await refreshGroup();
+    } catch (err) {
+      console.error("Settlement failed", err);
+    }
+  }
 
   return (
     <div className="dashboard-grid">
@@ -43,12 +68,17 @@ function Dashboard() {
           totalSpent={totalSpent}
           userPaid={userPaid}
           userShare={userShare}
+          netBalance={netBalance}
           expensesCount={expenseCount}
         />
       </div>
 
       <div className="cards col-3">
-        <ToPay payList={payList} netBalance={netBalance} />
+        <ToPay
+          payList={payList}
+          netBalance={netBalance}
+          onConfirmSettlement={handleConfirmSettlement}
+        />
       </div>
 
       <div className="cards col-3">
