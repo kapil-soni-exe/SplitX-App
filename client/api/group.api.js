@@ -19,3 +19,6 @@ export const CheckInviteCode =(inviteCode)=>{
 export const joinGroupByInvite = (inviteCode) => {
   return apiClient.post(`/groups/join/${inviteCode}`);
 };
+export const leaveGroup=(groupId)=>{
+ return apiClient.post(`/groups/${groupId}/leave`)
+}
