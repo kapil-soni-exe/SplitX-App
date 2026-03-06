@@ -1,12 +1,16 @@
-require("dotenv").config()
+require("dotenv").config();
+const http = require("http");
+const initSocket = require("./src/sockets/index");
 
-const app = require("./src/app")
+const app = require("./src/app");
+const server = http.createServer(app);
 
-const connectToDb = require("./src/config/database")
+const connectToDb = require("./src/config/database");
 
-connectToDb()
+connectToDb();
 
+server.listen(3000, () => {
+  console.log("Server is running");
+});
 
-app.listen(3000,()=>{
-    console.log("Server is running")
-})
+initSocket(server);
