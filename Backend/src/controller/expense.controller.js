@@ -2,10 +2,14 @@ const Expense = require("../models/expense.model");
 const expenseService = require("../services/Expenses/index");
 const { editExpense } = require("../services/Expenses/editExpense");
 const { deleteExpense } = require("../services/Expenses/deleteExpense");
+const { getIO } = require("../sockets/socketManager");
 // Create Expenses
 const createExpense = async (req, res) => {
   try {
     const expense = await expenseService.createExpense(req.body, req.user);
+    const io = getIO();
+
+    io.to(expense.groupId.toString()).emit("expense-added", expense);
     return res.status(201).json({
       success: true,
       expense,
@@ -58,6 +62,12 @@ const updateExpense = async (req, res) => {
       userId,
     });
 
+    const io = getIO();
+    io.to(updatedExpense.groupId.toString()).emit(
+      "expense-updated",
+      updatedExpense,
+    );
+
     return res.status(200).json({
       message: "Expense updated successfully",
       expense: updatedExpense,
@@ -88,6 +98,18 @@ const deleteExpenseController = async (req, res) => {
 
   try {
     const result = await deleteExpense({ expenseId, userId });
+
+    const io = getIO();
+ 
+  io.to(result.groupId.toString()).emit("expense-deleted", {
+    
+  expenseId: result.expenseId,
+  deletedBy: {
+    _id: req.user._id,
+    name: req.user.name
+  }
+  
+});
 
     return res.status(200).json(result);
   } catch (err) {
