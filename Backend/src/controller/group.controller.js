@@ -1,4 +1,6 @@
 const Group = require("../models/group.model");
+
+const { getIO } = require("../sockets/socketManager");
 const crypto = require("crypto");
 
 const {
@@ -53,6 +55,7 @@ const createGroup = async (req, res) => {
     const group = await Group.create({
       name,
       createdBy,
+      admin:createdBy,
       members: [
         {
           userId: createdBy,
@@ -67,6 +70,7 @@ const createGroup = async (req, res) => {
         _id: group._id,
         name: group.name,
         inviteCode: group.inviteCode,
+        admin:group.admin
       },
     });
   } catch (error) {
@@ -248,6 +252,17 @@ const joinGroup = async (req, res) => {
 
     await group.save();
 
+    const io = getIO();
+
+    io.to(group._id.toString()).emit("member-joined", {
+      groupId: group._id,
+      user: {
+        _id: req.user._id,
+        name: req.user.name,
+      },
+      createdAt: new Date(),
+    });
+
     // Populate before sending response
     const populatedGroup = await Group.findById(group._id).populate(
       "members.userId",
@@ -269,10 +284,12 @@ const joinGroup = async (req, res) => {
 };
 
 // Leave Group
+// Leave Group
 const leaveGroup = async (req, res) => {
   try {
     const { groupId } = req.params;
     const userId = req.user.id;
+    const userName = req.user.name;
 
     const group = await Group.findById(groupId);
 
@@ -284,7 +301,9 @@ const leaveGroup = async (req, res) => {
     }
 
     // Check if user is member
-    const isMember = group.members.some((m) => m.userId.toString() === userId);
+    const isMember = group.members.some(
+      (m) => m.userId.toString() === userId
+    );
 
     if (!isMember) {
       return res.status(403).json({
@@ -293,9 +312,8 @@ const leaveGroup = async (req, res) => {
       });
     }
 
-    // Check if user balance is settled
+    // Check balance
     const balance = await getUserNetBalance(groupId, userId);
-    console.log("User balance:", balance);
 
     if (balance !== 0) {
       return res.status(400).json({
@@ -304,10 +322,31 @@ const leaveGroup = async (req, res) => {
       });
     }
 
-    // Remove member from group
-    group.members = group.members.filter((m) => m.userId.toString() !== userId);
+    const io = getIO();
 
-    // Add activity
+    // Check if admin
+    const isAdmin = group.admin.toString() === userId;
+
+    // Remaining members
+    const remainingMembers = group.members.filter(
+      (m) => m.userId.toString() !== userId
+    );
+
+    // Admin transfer
+    if (isAdmin && remainingMembers.length > 0) {
+      remainingMembers.sort(
+        (a, b) => new Date(a.joinedAt) - new Date(b.joinedAt)
+      );
+
+      group.admin = remainingMembers[0].userId;
+
+      
+    }
+
+    // Remove member
+    group.members = remainingMembers;
+
+    // Activity log
     group.activities.push({
       type: "GROUP_LEAVE",
       userId,
@@ -316,14 +355,25 @@ const leaveGroup = async (req, res) => {
 
     await group.save();
 
+    // Notify members
+    io.to(groupId).emit("member-left", {
+      groupId,
+      user: {
+        _id: req.user._id,
+        name: userName,
+      },
+      createdAt: new Date(),
+    });
+
     return res.status(200).json({
       success: true,
       message: "You left the group successfully",
     });
+
   } catch (error) {
     console.error("Leave group error:", error);
 
-    res.status(500).json({
+    return res.status(500).json({
       success: false,
       message: "Failed to leave group",
     });
