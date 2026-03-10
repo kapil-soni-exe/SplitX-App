@@ -15,7 +15,7 @@ export function buildJoinActivities(group) {
         new Date(group.createdAt)
     )
     .map((m) => ({
-      _id: `join-${m.userId._id}`,
+      _id: `join-${m.userId._id}-${m.joinedAt}`,
       type: "JOIN",
       user: m.userId,
       createdAt: m.joinedAt,
