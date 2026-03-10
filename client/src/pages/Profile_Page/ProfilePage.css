@@ -1,0 +1,452 @@
+/* =====================================
+   Profile Page Layout
+===================================== */
+
+.profile-page{
+
+  max-width:900px;
+  margin:40px auto;
+  padding:20px;
+
+  display:flex;
+  flex-direction:column;
+  
+  gap:28px;
+
+}
+
+
+
+/* =====================================
+   Profile Header
+===================================== */
+
+.profile-header{
+
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+
+  padding:26px 32px;
+
+  background:var(--bg-card);
+  background-image:var(--card-gradiant);
+
+  border-radius:16px;
+  border:1px solid var(--border);
+
+}
+
+
+
+/* =====================================
+   Left Section
+===================================== */
+
+.profile-left{
+
+  display:flex;
+  align-items:center;
+  gap:18px;
+
+}
+
+
+
+/* =====================================
+   Avatar
+===================================== */
+
+.profile-avatar{
+
+  width:64px;
+  height:64px;
+
+  border-radius:50%;
+
+  display:flex;
+  align-items:center;
+  justify-content:center;
+
+  font-size:24px;
+  font-weight:600;
+
+  background:var(--accent);
+  color:var(--button-text);
+
+}
+
+
+
+/* =====================================
+   Profile Info
+===================================== */
+
+.profile-info{
+  display:flex;
+  flex-direction:column;
+}
+
+
+
+.profile-name{
+
+  font-size:22px;
+  font-weight:600;
+
+  color:var(--text-primary);
+
+}
+
+
+
+.profile-email{
+
+  font-size:14px;
+
+  color:var(--text-muted);
+
+  margin-top:3px;
+
+}
+
+
+
+/* =====================================
+   Edit Button
+===================================== */
+
+.edit-profile-btn{
+
+  padding:10px 18px;
+
+  border-radius:8px;
+
+  border:none;
+
+  background:var(--accent);
+  color:var(--button-text);
+
+  cursor:pointer;
+
+  font-size:14px;
+
+  transition:background 0.2s ease;
+
+}
+
+
+
+.edit-profile-btn:hover{
+
+  background:var(--active-btn);
+
+}
+
+
+
+/* =====================================
+   Profile Stats
+===================================== */
+
+.profile-stats{
+
+  display:grid;
+  grid-template-columns:repeat(3,1fr);
+
+  background:var(--bg-card);
+
+  border:1px solid var(--border);
+
+  border-radius:16px;
+
+  overflow:hidden;
+
+}
+
+
+
+.stat{
+
+  padding:22px;
+
+  text-align:center;
+
+  border-right:1px solid var(--border);
+
+}
+
+
+
+.stat:last-child{
+  border-right:none;
+}
+
+
+
+.stat-number{
+
+  font-size:22px;
+
+  font-weight:600;
+
+  color:var(--text-primary);
+
+  margin-bottom:6px;
+
+}
+
+
+
+.stat-label{
+
+  font-size:13px;
+
+  color:var(--text-muted);
+
+}
+
+
+
+/* =====================================
+   Profile Actions
+===================================== */
+
+.profile-actions{
+
+  background:var(--bg-card);
+
+  border:1px solid var(--border);
+
+  border-radius:16px;
+
+  overflow:hidden;
+
+}
+
+
+
+.profile-action{
+
+  width:100%;
+
+  padding:16px 18px;
+
+  text-align:left;
+
+  border:none;
+
+  background:transparent;
+
+  cursor:pointer;
+
+  font-size:14px;
+
+  color:var(--text-secondary);
+
+  border-bottom:1px solid var(--border);
+
+  transition:background 0.2s ease;
+
+}
+
+
+
+.profile-action:last-child{
+  border-bottom:none;
+}
+
+
+
+.profile-action:hover{
+
+  background:var(--interactive-bg);
+
+}
+
+
+
+.logout{
+
+  color:#e5484d;
+
+}
+
+/* =====================================
+   Theme Toggle Row
+===================================== */
+
+.theme-action{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+}
+
+
+
+/* =====================================
+   Toggle Switch
+===================================== */
+
+.switch{
+  position:relative;
+  width:44px;
+  height:22px;
+}
+
+
+
+.switch input{
+  opacity:0;
+  width:0;
+  height:0;
+}
+
+.pw-btn{
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+
+
+.slider{
+  position:absolute;
+
+  top:0;
+  left:0;
+  right:0;
+  bottom:0;
+
+  background:var(--border);
+
+  border-radius:20px;
+
+  cursor:pointer;
+
+  transition:0.3s;
+}
+
+
+
+/* circle */
+
+.slider::before{
+
+  content:"";
+
+  position:absolute;
+
+  height:18px;
+  width:18px;
+
+  left:2px;
+  bottom:2px;
+
+  background:var(--bg-main);
+
+  border-radius:50%;
+
+  transition:0.3s;
+
+}
+
+
+
+/* checked */
+
+.switch input:checked + .slider{
+  background:var(--accent);
+}
+
+
+
+/* move knob */
+
+.switch input:checked + .slider::before{
+  transform:translateX(22px);
+}
+
+/* =====================================
+   Tablet
+===================================== */
+
+@media (max-width: 768px){
+
+  .profile-page{
+    max-width:100%;
+    margin:20px auto;
+    padding:16px;
+    padding-bottom:calc(60px + 20px);
+  }
+
+  .profile-header{
+    padding:20px;
+  }
+
+  .profile-avatar{
+    width:56px;
+    height:56px;
+    font-size:20px;
+  }
+
+  .profile-name{
+    font-size:20px;
+  }
+
+  .profile-stats{
+    grid-template-columns:repeat(3,1fr);
+  }
+
+  .stat{
+    padding:18px;
+  }
+
+}
+
+
+
+/* =====================================
+   Mobile
+===================================== */
+
+@media (max-width: 480px){
+
+  .profile-page{
+    gap:20px;
+  }
+
+  .profile-header{
+    flex-direction:column;
+    align-items:flex-start;
+    gap:16px;
+  }
+
+  .profile-left{
+    width:100%;
+  }
+
+  .edit-profile-btn{
+    width:100%;
+  }
+
+  .profile-stats{
+    grid-template-columns:1fr;
+  }
+
+  .stat{
+    border-right:none;
+    border-bottom:1px solid var(--border);
+    padding: 10px;
+  }
+  .stat-number{
+    font-size:18px;
+    font-weight:700;
+  }
+   .stat-label{
+    font-size:12px;
+  }
+  .stat:last-child{
+    border-bottom:none;
+  }
+
+}

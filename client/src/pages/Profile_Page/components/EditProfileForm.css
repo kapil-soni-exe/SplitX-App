@@ -1,0 +1,99 @@
+.edit-profile-form {
+  width: 100%;
+  max-width: 340px;
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+  color: var(--text-primary);
+}
+
+.edit-profile-form h2 {
+  text-align: center;
+  font-size: 20px;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+/* form group */
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.form-group label {
+  font-size: 14px;
+  color: var(--text-secondary);
+}
+
+.form-group input {
+  padding: 10px 12px;
+  border-radius: 6px;
+  border: 1px solid var(--border);
+  background: var(--bg-card);
+  color: var(--text-primary);
+  font-size: 14px;
+  outline: none;
+  transition: all 0.2s ease;
+}
+
+/* focus state */
+
+.form-group input:focus {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 2px var(--interactive-bg);
+}
+
+/* disabled email */
+
+.form-group input:disabled {
+  background: var(--card-alpha);
+  color: var(--text-muted);
+}
+
+/* buttons */
+
+.form-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+  margin-top: 5px;
+}
+
+.form-actions button {
+  padding: 8px 14px;
+  border-radius: 6px;
+  font-size: 14px;
+  border: none;
+  cursor: pointer;
+  transition: 0.2s;
+}
+
+/* cancel button */
+
+.form-actions button:first-child {
+  background: var(--bg-card);
+  color: var(--text-secondary);
+  border: 1px solid var(--border);
+}
+
+.form-actions button:first-child:hover {
+  background: var(--interactive-bg);
+}
+
+/* save button */
+
+.form-actions button:last-child {
+  background: var(--accent);
+  color: var(--button-text);
+}
+
+.form-actions button:last-child:hover {
+  background: var(--active-btn);
+}
+
+.form-actions button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
