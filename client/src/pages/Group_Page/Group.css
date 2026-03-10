@@ -1,21 +1,16 @@
 .groups-page {
- display: flex;
- width: 100%;
- max-width: 100%;
- overflow-x: hidden;
- position: relative;
- padding: 0 10px;
-  
- 
-  
+  display: flex;
+  width: 100%;
+  max-width: 100%;
+  overflow-x: hidden;
+  position: relative;
+  padding: 0 10px;
 }
 
 /* LEFT LIST */
 .groups-left {
   width: 300px;
-  height: 450px;
-  
-  
+  height: clamp(450px, 80vh, 900px);
 }
 
 /* RIGHT DETAIL */
@@ -23,18 +18,16 @@
   position: relative;
   flex: 1;
   background: transparent;
- min-width: 0;
- height: 450px;
+  min-width: 0;
+  height: clamp(450px, 80vh, 900px);
   display: flex;
   flex-direction: column;
-
 }
 
 .group-placeholder {
   color: var(--text-muted);
   font-size: 0.9rem;
 }
-
 
 /* DESKTOP GROUP INFO PANEL */
 
@@ -56,11 +49,8 @@
   transform: translateX(0);
 }
 
-
-
-@media(max-width:768px){
-
-  .groups-page{
+@media (max-width: 768px) {
+  .groups-page {
     position: relative;
     display: block;
 
@@ -75,7 +65,7 @@
   }
 
   .groups-left,
-  .groups-right{
+  .groups-right {
     position: absolute;
     inset: 0;
 
@@ -90,7 +80,7 @@
     max-width: 100vw !important;
   }
 
-  .groups-left{
+  .groups-left {
     transform: translateX(0);
   }
 
@@ -106,7 +96,7 @@
     transform: translateX(0);
   }
 
-   .groups-info {
+  .groups-info {
     position: absolute;
     inset: 0;
 

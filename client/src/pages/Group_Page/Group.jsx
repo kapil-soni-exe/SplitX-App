@@ -8,7 +8,7 @@ import { useAuth } from "../../context/AuthContext";
 import { useGroupManager } from "../../hooks/useGroupManager";
 
 function Group() {
-  const { groups, selectedGroupId, selectGroup, addGroup, fetchGroups } =
+  const { groups, selectedGroupId, selectGroup, addGroup, fetchGroups,handleGroupLeft } =
     useGroupManager();
 
   const [showChatMobile, setShowChatMobile] = useState(false);
@@ -68,6 +68,9 @@ function Group() {
           <GroupInfo
             groupId={selectedGroupId}
             onBack={() => setShowGroupInfo(false)}
+            onGroupLeft={handleGroupLeft}
+            onCloseChat={() => setShowChatMobile(false)}
+
           />
         )}
       </div>
