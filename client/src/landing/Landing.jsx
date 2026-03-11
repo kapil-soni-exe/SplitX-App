@@ -4,6 +4,7 @@ import Hero from './components/Hero'
 import HowItsWork from './components/HowItsWork'
 import Features from './components/Features'
 import Footer from './components/Footer'
+import CustomCursor from './components/CustomCursor'
 import "./LandingPage.css";
 
 
@@ -11,6 +12,7 @@ import "./LandingPage.css";
 function Landing() {
   return (
     <>
+    <CustomCursor />
     <Navbar/>
     <Hero/>
     <HowItsWork/>

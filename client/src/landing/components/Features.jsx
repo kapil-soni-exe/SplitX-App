@@ -1,78 +1,74 @@
-import React from 'react'
+import React from 'react';
+import { motion } from 'framer-motion';
+import { Users, PieChart, Bell, History, ShieldCheck } from 'lucide-react';
 
 function Features() {
+  const containerVariants = {
+    hidden: { opacity: 0 },
+    show: {
+      opacity: 1,
+      transition: { staggerChildren: 0.1 }
+    }
+  };
+
+  const itemVariants = {
+    hidden: { opacity: 0, y: 20 },
+    show: { opacity: 1, y: 0, transition: { type: "spring", stiffness: 300, damping: 24 } }
+  };
+
   return (
-    <section className="features" id='feature'>
+    <section className="features-bento" id='feature'>
       <div className="features-headings">
-        <h1 className="features-title">Features</h1>
+        <h1 className="features-title">Everything you need.</h1>
         <p className="features-subtitle">
-          Everything you need to manage shared expenses with ease.
+          Powerful tools designed for frictionless sharing.
         </p>
       </div>
 
-      <div className="timeline">
-        {/* Item 1 */}
-        <div className="timeline-item">
-          <div className="timeline-marker"></div>
+      <motion.div 
+        className="bento-grid"
+        variants={containerVariants}
+        initial="hidden"
+        whileInView="show"
+        viewport={{ once: true, margin: "-100px" }}
+      >
+        {/* Large Feature */}
+        <motion.div className="bento-item span-2" variants={itemVariants}>
+          <div className="bento-icon-wrapper"><Users size={28} /></div>
+          <h3>Smart group splits</h3>
+          <p>Automatically split expenses fairly across everyone in the group. Define custom percentages, exact amounts, or let the algorithm handle equal shares effortlessly.</p>
+        </motion.div>
 
-          <div className="timeline-content">
-            <h3>Smart group splits</h3>
-            <p>
-              Automatically split expenses fairly across everyone in the group.
-            </p>
-          </div>
-        </div>
+        {/* Medium Feature */}
+        <motion.div className="bento-item" variants={itemVariants}>
+          <div className="bento-icon-wrapper"><PieChart size={28} /></div>
+          <h3>Real-time balances</h3>
+          <p>Always know who owes whom with instant visual balance updates.</p>
+        </motion.div>
 
-        {/* Item 2 */}
-        <div className="timeline-item">
-          <div className="timeline-marker"></div>
+        {/* Medium Feature */}
+        <motion.div className="bento-item" variants={itemVariants}>
+          <div className="bento-icon-wrapper"><ShieldCheck size={28} /></div>
+          <h3>Clear settlements</h3>
+          <p>Settle up without the awkward money conversations. One click.</p>
+        </motion.div>
 
-          <div className="timeline-content">
-            <h3>Real-time balances</h3>
-            <p>
-              Always know who owes whom with instant balance updates.
-            </p>
-          </div>
-        </div>
+        {/* Small Feature */}
+        <motion.div className="bento-item" variants={itemVariants}>
+          <div className="bento-icon-wrapper"><History size={28} /></div>
+          <h3>History</h3>
+          <p>Track all past expenses easily.</p>
+        </motion.div>
 
-        {/* Item 3 */}
-        <div className="timeline-item">
-          <div className="timeline-marker"></div>
-
-          <div className="timeline-content">
-            <h3>Clear settlements</h3>
-            <p>
-              Settle up without awkward money conversations.
-            </p>
-          </div>
-        </div>
-
-        {/* Item 4 */}
-        <div className="timeline-item">
-          <div className="timeline-marker"></div>
-
-          <div className="timeline-content">
-            <h3>Expense history</h3>
-            <p>
-              View and track all past expenses anytime.
-            </p>
-          </div>
-        </div>
-
-        {/* Item 5 */}
-        <div className="timeline-item">
-          <div className="timeline-marker"></div>
-
-          <div className="timeline-content">
-            <h3>Notifications</h3>
-            <p>
-              Stay informed whenever new expenses are added.
-            </p>
-          </div>
-        </div>
-      </div>
+        {/* Small Feature */}
+        <motion.div className="bento-item" variants={itemVariants}>
+          <div className="bento-icon-wrapper"><Bell size={28} /></div>
+          <h3>Alerts</h3>
+          <p>Instant notifications.</p>
+        </motion.div>
+      </motion.div>
     </section>
   )
 }
 
-export default Features
+export default Features;
