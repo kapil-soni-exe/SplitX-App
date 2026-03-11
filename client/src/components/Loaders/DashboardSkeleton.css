@@ -1,0 +1,54 @@
+.skeleton-card {
+  position: relative;
+  border-radius: 12px;
+  background: var(--bg-card);
+  border: 1px solid var(--glass-border);
+  overflow: hidden;
+  min-height: 120px;
+}
+
+/* Glass subtle effect */
+
+.skeleton-card::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: var(--card-gradiant);
+  opacity: 0.4;
+}
+
+/* Shimmer animation */
+
+.skeleton-card::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  transform: translateX(-100%);
+  background: linear-gradient(
+    90deg,
+    transparent,
+    var(--card-alpha),
+    transparent
+  );
+  animation: skeleton-shimmer 1.4s infinite;
+}
+
+@keyframes skeleton-shimmer {
+  100% {
+    transform: translateX(100%);
+  }
+}
+
+/* Different heights for dashboard layout */
+
+.skeleton-card.tall {
+  min-height: 220px;
+}
+
+.skeleton-card.medium {
+  min-height: 160px;
+}
+
+.skeleton-card.small {
+  min-height: 110px;
+}
