@@ -1,0 +1,136 @@
+/* Wrapper */
+.settlement-selector {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+/* Title */
+.selector-title {
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  letter-spacing: 0.2px;
+}
+
+/* List */
+.selector-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+
+  max-height: 260px;
+  overflow-y: auto;
+  padding-right: 4px;
+}
+
+/* Scrollbar */
+.selector-list::-webkit-scrollbar {
+  width: 6px;
+}
+
+.selector-list::-webkit-scrollbar-thumb {
+  background: var(--interactive-bg);
+  border-radius: 10px;
+}
+
+.selector-list::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+/* Row */
+.selector-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+
+  background: var(--card-alpha);
+  backdrop-filter: blur(6px);
+  border: 1px solid var(--border);
+
+  padding: 0.6rem 0.7rem;
+  border-radius: 14px;
+
+  transition: all 0.2s ease;
+}
+
+.selector-row:hover {
+  background: var(--bg-main);
+  transform: translateY(-1px);
+}
+
+/* Left section */
+.selector-row label {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  cursor: pointer;
+}
+
+/* Checkbox */
+.selector-row input[type="checkbox"] {
+  accent-color: var(--accent);
+  cursor: pointer;
+}
+
+/* Name */
+.selector-name {
+  font-size: 0.85rem;
+  color: var(--text-primary);
+  font-weight: 500;
+}
+
+/* Amount */
+.selector-amount {
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: #ef4444; /* Pay color */
+}
+
+/* Footer */
+.selector-footer {
+  margin-top: 0.5rem;
+  padding-top: 0.8rem;
+  border-top: 1px solid var(--border);
+
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+/* Total */
+.selector-total {
+  font-size: 0.85rem;
+  color: var(--text-muted);
+}
+
+.selector-total strong {
+  color: var(--text-primary);
+  font-size: 0.95rem;
+}
+
+/* Confirm Button */
+.selector-confirm {
+  background: var(--accent);
+  color: #fff;
+  border: none;
+  border-radius: 999px;
+
+  padding: 0.45rem 1rem;
+  font-size: 0.75rem;
+  font-weight: 600;
+
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.selector-confirm:hover {
+  opacity: 0.85;
+}
+
+.selector-confirm:disabled {
+  background: var(--border);
+  color: var(--text-muted);
+  cursor: not-allowed;
+  opacity: 0.6;
+}
