@@ -31,11 +31,17 @@ export function useGroupManager() {
     setSelectedGroupId(groupId);
   };
 
+  const handleGroupLeft = async () => {
+  await fetchGroups();
+  selectGroup(null);
+};
+
   return {
     groups,
     selectedGroupId,
     selectGroup,
     addGroup,
     fetchGroups,
+    handleGroupLeft
   };
 }

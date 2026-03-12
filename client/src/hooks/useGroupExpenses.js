@@ -1,16 +1,3 @@
-/**
- * useGroupExpenses
- * ----------------
- * Handles all expense-related side effects for a group:
- * - Fetch expenses by groupId
- * - Create a new expense
- * - Update an existing expense
- *
- * NOTE:
- * - UI state (modal, selection) is NOT handled here
- * - Logic is moved as-is from GroupDetails
- */
-
 import { useEffect, useState } from "react";
 import {
   createExpense,
@@ -20,9 +7,13 @@ import {
 } from "../../api/expense.api";
 
 export function useGroupExpenses(groupId, onExpenseCreated) {
+
   const [expenses, setExpenses] = useState([]);
 
-  // 🔹 fetch expenses
+  /* =========================
+     Fetch expenses
+  ========================= */
+
   useEffect(() => {
     if (!groupId) return;
 
@@ -38,41 +29,145 @@ export function useGroupExpenses(groupId, onExpenseCreated) {
     loadExpenses();
   }, [groupId]);
 
-  // create expense (same logic as before)
-  const addExpense = async (expenseData) => {
-    await createExpense(expenseData);
-    await onExpenseCreated();
+  /* =========================
+     Create expense (API)
+  ========================= */
 
-    const res = await fetchExpensesByGroup(groupId);
-    setExpenses(res.data.expenses);
+  const addExpense = async (expenseData) => {
+    try {
+      await createExpense(expenseData);
+
+      if (onExpenseCreated) {
+        await onExpenseCreated();
+      }
+
+      // No refetch needed → socket will sync
+    } catch (err) {
+      console.error("Create expense failed:", err);
+    }
   };
 
-  //  update expense (local replace)
-  const updateExpenseById = async (id, expenseData) => {
-    const res = await updateExpense(id, expenseData);
-    const updatedExpense = res.data.expense;
+  /* =========================
+     Update expense (API)
+  ========================= */
 
+  const updateExpenseById = async (id, expenseData) => {
+    try {
+      const res = await updateExpense(id, expenseData);
+      const updatedExpense = res.data.expense;
+
+      setExpenses((prev) =>
+        prev.map((e) =>
+          e._id === updatedExpense._id ? updatedExpense : e
+        )
+      );
+    } catch (err) {
+      console.error("Update expense failed:", err);
+    }
+  };
+
+  /* =========================
+     Delete expense (API)
+  ========================= */
+
+  const deleteExpenseById = async (expenseId) => {
+    try {
+      await deleteExpense(expenseId);
+      // socket will update UI
+    } catch (err) {
+      console.error("Delete expense failed:", err);
+    }
+  };
+
+  
+
+  /* =========================
+     Socket helpers (NO API)
+  ========================= */
+
+  const addExpenseLocal = (expense) => {
+    setExpenses((prev) => {
+
+      // prevent duplicates
+      const exists = prev.some(e => e._id === expense._id);
+      if (exists) return prev;
+
+      return [expense, ...prev];
+    });
+  };
+
+  const updateExpenseLocal = (expense) => {
     setExpenses((prev) =>
       prev.map((e) =>
-        e._id === updatedExpense._id ? updatedExpense : e
+        e._id === expense._id ? expense : e
       )
     );
   };
 
-   // Delete expense (soft delete)
-  
-    const deleteExpenseById = async (expenseId) => {
-    await deleteExpense(expenseId);
+  const deleteExpenseLocal = ({ expenseId, deletedBy }) => {
 
-    //  ALWAYS refetch after delete
-    const res = await fetchExpensesByGroup(groupId);
-    setExpenses(res.data.expenses);
+    setExpenses((prev) =>
+      prev.map((e) =>
+        String(e._id) === String(expenseId)
+          ? {
+              ...e,
+              deletedAt: new Date(),
+              deletedBy
+            }
+          : e
+      )
+    );
+    
+
+    
   };
+
+
+
+  const addJoinActivityLocal = ({ user, createdAt }) => {
+  setExpenses(prev => [
+    ...prev,
+    {
+      _id: `join-${user._id}-${createdAt}`,
+      type: "JOIN",
+      user,
+      createdAt
+    }
+  ]);
+};
+
+const addLeaveActivityLocal = ({ user, createdAt }) => {
+  setExpenses(prev => [
+    ...prev,
+    {
+      _id: `leave-${user._id}-${createdAt}`,
+      type: "LEAVE",
+      user,
+      createdAt
+    }
+  ]);
+};
+
+function updateAdminLocal(adminId) {
+  setGroup((prev) => ({
+    ...prev,
+    admin: adminId
+  }));
+}
+  /* =========================
+     Expose API + socket helpers
+  ========================= */
 
   return {
     expenses,
     addExpense,
     updateExpenseById,
-    deleteExpenseById
+    deleteExpenseById,
+    addExpenseLocal,
+    updateExpenseLocal,
+    deleteExpenseLocal,
+    addJoinActivityLocal,
+    addLeaveActivityLocal,
+
   };
 }
