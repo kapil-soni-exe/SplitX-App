@@ -15,7 +15,7 @@ export default defineConfig({
         theme_color: "#0f172a",
         background_color: "#0f172a",
         display: "fullscreen",
-        start_url: "/",
+        start_url: "/dashboard",
         icons: [
           {
             src: "/icons/icon-192x192.png",
