@@ -58,33 +58,32 @@
     transform 0.15s ease;
 }
 
-/* tap */
-.bottom-nav-item:active {
-  transform: scale(0.9);
+.nav-content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 3px;
+  z-index: 2;
+  transition: color 0.25s ease;
 }
 
-/* active */
-.bottom-nav-item.active {
+.nav-content.active {
   color: var(--accent);
 }
 
-/* soft glow for active tab */
-.bottom-nav-item.active::before {
-  content: "";
+/* Framer motion sliding pill */
+.nav-indicator {
   position: absolute;
-
-  width: 42px;
-  height: 42px;
-
+  width: 48px;
+  height: 48px;
   border-radius: 50%;
-
   background: radial-gradient(
     circle,
-    color-mix(in srgb, var(--accent) 35%, transparent),
-    transparent 65%
+    color-mix(in srgb, var(--accent) 25%, transparent),
+    transparent 75%
   );
-
-  z-index: -1;
+  z-index: 0;
 }
 
 /* icon size */

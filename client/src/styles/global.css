@@ -51,7 +51,25 @@ a, button, input {
   border-radius: 50%;
   background-color: var(--text-primary);
   mix-blend-mode: difference;
-  pointer-events: none;
   z-index: 9999;
   transform: translate(-50%, -50%);
+}
+
+/* Custom Scrollbar */
+::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+}
+
+::-webkit-scrollbar-track {
+    background: var(--bg-main);
+}
+
+::-webkit-scrollbar-thumb {
+    background: var(--glass-border);
+    border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: var(--text-muted);
 }

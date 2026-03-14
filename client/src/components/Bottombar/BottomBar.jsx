@@ -1,11 +1,14 @@
 
 import React from "react";
-import { NavLink } from "react-router-dom";
+import { NavLink, useLocation } from "react-router-dom";
+import { motion } from "framer-motion";
 import "./BottomBar.css";
 import { mobileNavItem } from "./mobileNavItem";
 
 
 function BottomBar() {
+  const location = useLocation();
+
   return (
     <nav className="bottom-nav">
       {mobileNavItem.map((item) => {
@@ -15,12 +18,23 @@ function BottomBar() {
           <NavLink
             key={item.path}
             to={item.path}
-            className={({ isActive }) =>
-              `bottom-nav-item ${isActive ? "active" : ""}`
-            }
+            className="bottom-nav-item"
           >
-            <Icon size={22} />
-            <span>{item.label}</span>
+            {({ isActive }) => (
+              <>
+                {isActive && (
+                  <motion.div
+                    layoutId="bottomNavIndicator"
+                    className="nav-indicator"
+                    transition={{ type: "spring", stiffness: 400, damping: 30 }}
+                  />
+                )}
+                <span className={`nav-content ${isActive ? "active" : ""}`}>
+                  <Icon size={22} />
+                  <span className="nav-label">{item.label}</span>
+                </span>
+              </>
+            )}
           </NavLink>
         );
       })}

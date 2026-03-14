@@ -18,10 +18,14 @@ function App() {
      position="top-right"
      reverseOrder={false}
      toastOptions={{
-    style: {
-      zIndex: 9999
-    }
-  }}
+      style: {
+        zIndex: 9999,
+        background: 'var(--bg-card)',
+        color: 'var(--text-primary)',
+        border: '1px solid var(--border)',
+        backdropFilter: 'blur(10px)',
+      }
+    }}
     />
     <RouterProvider router={router} />
 </>
