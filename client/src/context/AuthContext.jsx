@@ -5,6 +5,7 @@ import { useEffect } from "react";
 import { useContext } from "react";
 import { createContext } from "react";
 import { logoutUser } from "../../api/auth.api";
+import apiClient from "../../api/apiClient";
 
 
 export const AuthContext = createContext(null)
@@ -14,8 +15,10 @@ export function AuthProvider({children}){
 
    /**
    * Restore user session on app load
-   * - Cookie is automatically sent (httpOnly)
-   * - Backend decides if user is authenticated
+   * - First tries to get current user with access token (cookie)
+   * - If access token expired (401), attempts a silent refresh
+   * - If refresh succeeds, retries AuthMe to restore session
+   * - Only sets user to null if refresh also fails (truly logged out)
    */
 
    useEffect(()=>{
@@ -24,7 +27,20 @@ export function AuthProvider({children}){
             const res = await AuthMe()
             setUser(res.data.user)
         }catch(err){
-            setUser(null);
+            // Access token likely expired - try a silent refresh
+            if(err.response?.status === 401){
+                try {
+                    await apiClient.post("/auth/refresh");
+                    // Refresh succeeded, retry to get user info
+                    const retryRes = await AuthMe();
+                    setUser(retryRes.data.user);
+                } catch (refreshErr) {
+                    // Refresh also failed - user truly not logged in
+                    setUser(null);
+                }
+            } else {
+                setUser(null);
+            }
         }finally{
             setLoading(false)
         }
@@ -57,4 +73,4 @@ export function AuthProvider({children}){
 
 export const useAuth = () => {
   return useContext(AuthContext);
-};
+};
