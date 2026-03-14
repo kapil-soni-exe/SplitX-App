@@ -1,16 +1,29 @@
-function buildPayList(expenses = [], members = [], currentUserId) {
+function buildPayList(
+  expenses = [],
+  settlements = [],
+  members = [],
+  currentUserId
+) {
   if (!Array.isArray(expenses) || !Array.isArray(members)) return [];
 
   const normalize = (id) => id.toString();
   const me = normalize(currentUserId);
 
-  // STEP 1
-  const stats = members.reduce((acc, m) => {
-    acc[normalize(m._id)] = { paid: 0, share: 0 };
-    return acc;
-  }, {});
+  // ===============================
+  // STEP 1: Member Map + Stats Init
+  // ===============================
+  const memberMap = {};
+  const stats = {};
 
-  // STEP 2
+  members.forEach((m) => {
+    const id = normalize(m._id);
+    memberMap[id] = m;
+    stats[id] = { paid: 0, share: 0 };
+  });
+
+  // ===============================
+  // STEP 2: Process Expenses
+  // ===============================
   expenses.forEach((expense) => {
     const amount = Number(expense.amount);
     if (!Number.isFinite(amount)) return;
@@ -18,8 +31,10 @@ function buildPayList(expenses = [], members = [], currentUserId) {
     const payerId = normalize(expense.paidBy);
     if (!stats[payerId]) return;
 
+    // payer paid full
     stats[payerId].paid += amount;
 
+    // EQUAL split
     if (expense.splitType === "EQUAL") {
       const perHead = Number(
         (amount / expense.splits.length).toFixed(2)
@@ -31,10 +46,12 @@ function buildPayList(expenses = [], members = [], currentUserId) {
       });
     }
 
+    // EXACT split
     if (expense.splitType === "EXACT") {
       expense.splits.forEach((s) => {
         const uid = normalize(s.userId);
         const shareAmount = Number(s.amount);
+
         if (stats[uid] && Number.isFinite(shareAmount)) {
           stats[uid].share += shareAmount;
         }
@@ -42,41 +59,71 @@ function buildPayList(expenses = [], members = [], currentUserId) {
     }
   });
 
-  // STEP 3
-  const netMap = Object.fromEntries(
-    Object.entries(stats).map(([uid, v]) => [
-      uid,
-      Number((v.paid - v.share).toFixed(2)),
-    ])
-  );
+  // ===============================
+  // STEP 3: Net Balance Map
+  // net = paid - share
+  // ===============================
+  const netMap = {};
 
-  const myNet = netMap[me];
+  Object.entries(stats).forEach(([uid, v]) => {
+    netMap[uid] = Number((v.paid - v.share).toFixed(2));
+  });
+
+  // ===============================
+  // STEP 4: Apply Settlements
+  // ===============================
+  settlements.forEach((s) => {
+    const from = normalize(s.from);
+    const to = normalize(s.to);
+    const amount = Number(s.amount);
+
+    if (!Number.isFinite(amount)) return;
+
+    if (netMap[from] !== undefined) {
+      netMap[from] = Number((netMap[from] + amount).toFixed(2));
+    }
+
+    if (netMap[to] !== undefined) {
+      netMap[to] = Number((netMap[to] - amount).toFixed(2));
+    }
+  });
+
+  const myNet = netMap[me] ?? 0;
+
+  // If I don't owe anyone
   if (myNet >= 0) return [];
 
   let remaining = Math.abs(myNet);
 
-  // STEP 4
+  // ===============================
+  // STEP 5: Find Creditors
+  // ===============================
   const creditors = Object.entries(netMap)
     .filter(([uid, net]) => uid !== me && net > 0)
     .map(([uid, net]) => ({ uid, net }))
     .sort((a, b) => b.net - a.net);
 
-  // STEP 5
-  return creditors.reduce((list, c) => {
-    if (remaining <= 0) return list;
+  // ===============================
+  // STEP 6: Greedy Distribution
+  // ===============================
+  const payList = [];
+
+  for (const c of creditors) {
+    if (remaining <= 0) break;
 
     const pay = Math.min(c.net, remaining);
-    const member = members.find((m) => normalize(m._id) === c.uid);
+    const member = memberMap[c.uid];
 
-    list.push({
+    payList.push({
       userId: c.uid,
       name: member?.name || "Unknown",
       amount: Number(pay.toFixed(2)),
     });
 
     remaining -= pay;
-    return list;
-  }, []);
+  }
+
+  return payList;
 }
 
-module.exports = buildPayList
+module.exports = buildPayList;

@@ -111,11 +111,15 @@ const Login = async (req, res) => {
 
     res.cookie("jwt_token", accessToken, {
       httpOnly: true,
+      secure: process.env.NODE_ENV === "production",
+      sameSite: "strict",
       maxAge: 15 * 60 * 1000,
     });
 
     res.cookie("refresh_token", refreshToken, {
       httpOnly: true,
+      secure: process.env.NODE_ENV === "production",
+      sameSite: "strict",
       maxAge: 7 * 24 * 60 * 60 * 1000,
     });
 
@@ -211,6 +215,8 @@ const refresh = async (req, res) => {
     // update cookie
     res.cookie("jwt_token", newAccessToken, {
       httpOnly: true,
+      secure: process.env.NODE_ENV === "production",
+      sameSite: "strict",
       maxAge: 15 * 60 * 1000,
     });
 
@@ -355,9 +361,6 @@ const resendOtp = async (req, res) => {
     // email send
     await sendOtpEmail({ to: email, otp });
 
-    console.log("OTP GENERATED:", otp);
-    console.log("EMAIL:", email);
-
     return res.status(200).json({
       message: "OTP resent successfully",
     });
@@ -397,4 +400,41 @@ const me = async (req, res) => {
   }
 };
 
-module.exports = { register, Login, logout, refresh, verifyEmail, resendOtp,me };
+
+ const updateFcmToken = async (req, res) => {
+
+  try {
+
+    const userId = req.user.id;
+    const { token } = req.body;
+
+    if (!token) {
+      return res.status(400).json({
+        message: "FCM token required"
+      });
+    }
+
+    await User.findByIdAndUpdate(
+      userId,
+      { fcmToken: token },
+      { new: true }
+    );
+
+    res.json({
+      success: true,
+      message: "FCM token saved"
+    });
+
+  } catch (error) {
+
+    console.error("FCM token save error:", error);
+
+    res.status(500).json({
+      message: "Server error"
+    });
+
+  }
+
+};
+
+module.exports = { register, Login, logout, refresh, verifyEmail, resendOtp,me,updateFcmToken };

@@ -154,15 +154,9 @@ const getGroupbyId = async (req, res) => {
       getExpensesCount(group._id),
     ]);
 
-    let netBalance = 0;
-
-    if (payList.length > 0) {
-      netBalance = -payList.reduce((sum, p) => sum + p.amount, 0);
-    }
-
-    if (receiveList.length > 0) {
-      netBalance = receiveList.reduce((sum, r) => sum + r.amount, 0);
-    }
+    const totalOwed = payList.reduce((sum, p) => sum + p.amount, 0);
+    const totalReceive = receiveList.reduce((sum, r) => sum + r.amount, 0);
+    const netBalance = totalReceive - totalOwed;
 
     return res.status(200).json({
       success: true,

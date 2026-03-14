@@ -9,7 +9,7 @@ const getExpensesByGroup = async (groupId, user) => {
   }
 
   const isMember = group.members.some(
-    (m) => m.toString() === user._id.toString()
+    (m) => m.userId.toString() === user._id.toString()
   );
 
   if (!isMember) {
@@ -22,7 +22,7 @@ const getExpensesByGroup = async (groupId, user) => {
     .populate("paidBy", "name")
     .populate("splits.userId", "name")
     .populate("deletedBy", "name")
-     .populate("createdBy", "name")
+    .populate("createdBy", "name")
     .sort({ expenseDate: -1, createdAt: -1 });
 
   return expenses;

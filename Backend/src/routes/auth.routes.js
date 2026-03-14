@@ -1,6 +1,6 @@
 const express = require("express")
 const router = express.Router()
-const {register,Login,logout,refresh, verifyEmail, resendOtp,me}= require("../controller/auth.controller")
+const {register,Login,logout,refresh, verifyEmail, resendOtp,me,updateFcmToken}= require("../controller/auth.controller")
 const Protected = require("../../middleware/auth.middleware")
 
 // register
@@ -22,6 +22,9 @@ router.post("/resend-otp", resendOtp)
 
 // Get Auth/me
 router.get("/me",Protected,me)
+
+// FCM TOKEN
+router.patch("/fcm-token", Protected , updateFcmToken);
 
 
 

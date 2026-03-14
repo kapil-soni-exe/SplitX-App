@@ -48,6 +48,8 @@ const deleteExpense = async ({ expenseId, userId }) => {
   return {
     success: true,
     message: "Expense deleted successfully",
+    expenseId: expense._id,
+    groupId: expense.groupId,
   };
 };
 

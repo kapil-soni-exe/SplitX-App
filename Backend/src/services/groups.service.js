@@ -1,5 +1,6 @@
 const Expense = require("../models/expense.model");
 const Group = require("../models/group.model");
+const Settlement = require("../models/settlement.model");
 
 const calculateTotalSpent = require("./calculation/calculateTotalSpent");
 const calculateUserPaid = require("./calculation/calculateUserPaid");
@@ -8,8 +9,9 @@ const calculateNetBalance = require("./calculation/calculateNetBalance");
 const buildPayList = require("./calculation/buildPayList");
 const buildReceiveList = require("./calculation/buildReceiveList");
 
+
 // ------------------------------
-// Get Group Total
+// Get Group Total Spent
 // ------------------------------
 async function getGroupTotalSpent(groupId) {
   try {
@@ -26,6 +28,7 @@ async function getGroupTotalSpent(groupId) {
     return 0;
   }
 }
+
 
 // ------------------------------
 // Get User Paid
@@ -47,6 +50,7 @@ async function getUserPaid(groupId, userId) {
   }
 }
 
+
 // ------------------------------
 // Get User Share
 // ------------------------------
@@ -66,17 +70,35 @@ async function getUserShare(groupId, userId) {
   }
 }
 
+
 // ------------------------------
 // Get User Net Balance
 // ------------------------------
 async function getUserNetBalance(groupId, userId) {
   try {
-    const [paid, share] = await Promise.all([
+    const [paid, share, settlements] = await Promise.all([
       getUserPaid(groupId, userId),
       getUserShare(groupId, userId),
+      Settlement.find({ groupId })
+        .select("from to amount")
+        .lean(),
     ]);
 
-    return calculateNetBalance(paid, share);
+    let net = calculateNetBalance(paid, share);
+
+    settlements.forEach((s) => {
+      const amount = Number(s.amount);
+
+      if (s.from.toString() === userId.toString()) {
+        net += amount; // user paid settlement
+      }
+
+      if (s.to.toString() === userId.toString()) {
+        net -= amount; // user received settlement
+      }
+    });
+
+    return Number(net.toFixed(2));
   } catch (err) {
     console.error("Error calculating net balance:", err);
     return 0;
@@ -84,11 +106,13 @@ async function getUserNetBalance(groupId, userId) {
 }
 
 // ------------------------------
-// Get Pay List 
+// Get Pay List
 // ------------------------------
 async function getPayList(groupId, currentUserId) {
   try {
-    const [expenses, group] = await Promise.all([
+
+    const [expenses, settlements, group] = await Promise.all([
+
       Expense.find({
         groupId,
         deletedAt: null,
@@ -96,38 +120,73 @@ async function getPayList(groupId, currentUserId) {
         .select("amount paidBy splitType splits")
         .lean(),
 
+      Settlement.find({
+        groupId,
+      })
+        .select("from to amount")
+        .lean(),
+
+      // Populate nested userId inside members
       Group.findById(groupId)
         .select("members")
-        .populate("members", "name")
+        .populate("members.userId", "name")
         .lean(),
     ]);
 
     if (!group || !Array.isArray(group.members)) return [];
 
-    return buildPayList(expenses, group.members, currentUserId);
+    /**
+     * Flatten members
+     * Convert:
+     * [{ userId, joinedAt }]
+     * →
+     * [{ _id, name }]
+     */
+    const members = group.members.map((m) => m.userId);
+
+    return buildPayList(expenses, settlements, members, currentUserId);
+
   } catch (err) {
     console.error("Error building pay list:", err);
     return [];
   }
 }
 
+
+// ------------------------------
 // Get Receive List
+// ------------------------------
 async function getReceiveList(groupId, currentUserId) {
   try {
-    const [expenses, group] = await Promise.all([
-      Expense.find({ groupId, deletedAt: null })
+
+    const [expenses, settlements, group] = await Promise.all([
+
+      Expense.find({
+        groupId,
+        deletedAt: null,
+      })
         .select("amount paidBy splitType splits")
+        .lean(),
+
+      Settlement.find({
+        groupId,
+      })
+        .select("from to amount")
         .lean(),
 
       Group.findById(groupId)
         .select("members")
-        .populate("members", "name")
+        .populate("members.userId", "name")
         .lean(),
     ]);
 
     if (!group) return [];
 
-    return buildReceiveList(expenses, group.members, currentUserId);
+    // Flatten members
+    const members = group.members.map((m) => m.userId);
+
+    return buildReceiveList(expenses, settlements, members, currentUserId);
+
   } catch (err) {
     console.error("Error building receive list:", err);
     return [];
@@ -135,21 +194,26 @@ async function getReceiveList(groupId, currentUserId) {
 }
 
 
+// ------------------------------
 // Get Expenses Count
 // ------------------------------
 async function getExpensesCount(groupId) {
   try {
+
     const count = await Expense.countDocuments({
       groupId,
       deletedAt: null,
     });
 
     return count;
+
   } catch (err) {
     console.error("Error counting expenses:", err);
     return 0;
   }
 }
+
+
 module.exports = {
   getGroupTotalSpent,
   getUserPaid,
@@ -157,5 +221,5 @@ module.exports = {
   getUserNetBalance,
   getPayList,
   getReceiveList,
-  getExpensesCount
+  getExpensesCount,
 };

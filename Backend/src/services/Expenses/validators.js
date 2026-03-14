@@ -6,12 +6,23 @@ const validateGroupAndMembers = async ({
   paidBy,
 }) => {
   const group = await Group.findById(groupId);
+
   if (!group) {
-    throw Object.assign(new Error("Group not found"), { statusCode: 404 });
+    throw Object.assign(new Error("Group not found"), {
+      statusCode: 404,
+    });
   }
 
-  const groupMemberIds = group.members.map((m) => m.toString());
+  /**
+   * Extract userIds from group members
+   * members now have structure:
+   * { userId, joinedAt }
+   */
+  const groupMemberIds = group.members.map((m) =>
+    m.userId.toString()
+  );
 
+  // At least 2 members required for split
   if (!splitBetween || splitBetween.length < 2) {
     throw Object.assign(
       new Error("Expense must be split between at least 2 members"),
@@ -19,6 +30,7 @@ const validateGroupAndMembers = async ({
     );
   }
 
+  // Validate each split member
   for (const memberId of splitBetween) {
     if (!groupMemberIds.includes(memberId.toString())) {
       throw Object.assign(
@@ -28,6 +40,7 @@ const validateGroupAndMembers = async ({
     }
   }
 
+  // Validate paidBy user
   if (!groupMemberIds.includes(paidBy.toString())) {
     throw Object.assign(
       new Error("PaidBy user does not belong to this group"),

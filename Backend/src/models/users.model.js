@@ -54,6 +54,11 @@ const userSchema = new mongoose.Schema(
     },
 
     refreshToken: String,
+
+    fcmToken: {
+    type: String,
+    default: null
+  }
   },
   {
     timestamps: true, // adds createdAt & updatedAt automatically

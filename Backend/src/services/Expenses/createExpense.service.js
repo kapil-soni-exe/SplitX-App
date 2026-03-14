@@ -11,8 +11,13 @@ const { validateGroupAndMembers } = require("../Expenses/validators");
 const createExpense = async (data, user) => {
   const { splitType, amount, splitBetween, splits, paidBy, groupId } = data;
 
+  const membersToValidate =
+  splitType === "EXACT"
+    ? splits.map((s) => s.userId)
+    : splitBetween;
+
   // SAME validation (shifted)
-  await validateGroupAndMembers({ groupId, splitBetween, paidBy });
+  await validateGroupAndMembers({ groupId, splitBetween:membersToValidate, paidBy });
 
   let finalSplits = [];
 
@@ -38,26 +43,30 @@ const createExpense = async (data, user) => {
     createdBy: user._id,
   });
 
-  const paidByUser = await User.findById(expense.paidBy).select("name");
+  const populatedExpense = await Expense.findById(expense._id)
+  .populate("paidBy", "name")
+  .populate("createdBy", "name")
+  .populate("splits.userId", "name");
 
   await Group.findByIdAndUpdate(groupId, {
-    lastExpense: {
-      expenseId: expense._id,
-      title: expense.title,
-      amount: expense.amount,
-      paidBy: {
-        _id: paidByUser._id,
-        name: paidByUser.name,
-      },
-      createdBy: {
-        _id: user._id,
-        name: user.name,
-      },
-      createdAt: expense.createdAt,
+  lastExpense: {
+    expenseId: populatedExpense._id,
+    title: populatedExpense.title,
+    amount: populatedExpense.amount,
+    paidBy: {
+      _id: populatedExpense.paidBy._id,
+      name: populatedExpense.paidBy.name,
     },
-  });
+    createdBy: {
+      _id: user._id,
+      name: user.name,
+    },
+    createdAt: populatedExpense.createdAt,
+  },
+});
 
-  return expense;
+
+  return populatedExpense;
 };
 
 module.exports = createExpense;

@@ -48,6 +48,7 @@ const editExpense = async ({ expenseId, data, userId }) => {
   // Return populated expense 
   const updatedExpense = await Expense.findById(expense._id)
     .populate("paidBy", "name")
+    .populate("createdBy", "name")
     .populate("splits.userId", "name");
 
   return updatedExpense;

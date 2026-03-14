@@ -41,4 +41,6 @@ const settlementSchema = new mongoose.Schema(
   { timestamps: true }
 );
 
+settlementSchema.index({ groupId: 1, from: 1, to: 1 });
+
 module.exports = mongoose.model("Settlement", settlementSchema);

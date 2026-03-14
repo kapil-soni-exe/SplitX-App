@@ -1,15 +1,25 @@
-function buildReceiveList(expenses = [], members = [], currentUserId) {
+function buildReceiveList(
+  expenses = [],
+  settlements = [],
+  members = [],
+  currentUserId
+) {
   if (!Array.isArray(expenses) || !Array.isArray(members)) return [];
 
   const normalize = (id) => id.toString();
+  const me = normalize(currentUserId);
 
-  // STEP 1: init stats
+  // ===============================
+  // STEP 1: Initialize stats
+  // ===============================
   const stats = members.reduce((acc, m) => {
     acc[normalize(m._id)] = { paid: 0, share: 0 };
     return acc;
   }, {});
 
-  // STEP 2: paid & share
+  // ===============================
+  // STEP 2: Process Expenses
+  // ===============================
   expenses.forEach((expense) => {
     const amount = Number(expense.amount);
     if (!Number.isFinite(amount)) return;
@@ -19,7 +29,6 @@ function buildReceiveList(expenses = [], members = [], currentUserId) {
 
     stats[payerId].paid += amount;
 
-    // EQUAL
     if (expense.splitType === "EQUAL") {
       const perHead = Number(
         (amount / expense.splits.length).toFixed(2)
@@ -31,11 +40,11 @@ function buildReceiveList(expenses = [], members = [], currentUserId) {
       });
     }
 
-    // EXACT
     if (expense.splitType === "EXACT") {
       expense.splits.forEach((s) => {
         const uid = normalize(s.userId);
         const shareAmount = Number(s.amount);
+
         if (stats[uid] && Number.isFinite(shareAmount)) {
           stats[uid].share += shareAmount;
         }
@@ -43,7 +52,9 @@ function buildReceiveList(expenses = [], members = [], currentUserId) {
     }
   });
 
-  // STEP 3: net
+  // ===============================
+  // STEP 3: Build Net Map
+  // ===============================
   const netMap = Object.fromEntries(
     Object.entries(stats).map(([uid, v]) => [
       uid,
@@ -51,20 +62,46 @@ function buildReceiveList(expenses = [], members = [], currentUserId) {
     ])
   );
 
-  const myNet = netMap[normalize(currentUserId)];
+  // ===============================
+  // STEP 4: Apply Settlements
+  // ===============================
+  settlements.forEach((settle) => {
+    const from = normalize(settle.from);
+    const to = normalize(settle.to);
+    const amount = Number(settle.amount);
+
+    if (!Number.isFinite(amount)) return;
+
+    if (netMap[from] !== undefined) {
+      netMap[from] += amount;
+    }
+
+    if (netMap[to] !== undefined) {
+      netMap[to] -= amount;
+    }
+  });
+
+  const myNet = netMap[me];
+
+  // If I am not supposed to receive anything
   if (myNet <= 0) return [];
 
   let remaining = myNet;
 
-  // STEP 4: debtors
+  // ===============================
+  // STEP 5: Find Debtors
+  // ===============================
   const debtors = Object.entries(netMap)
-    .filter(([uid, net]) => uid !== normalize(currentUserId) && net < 0)
+    .filter(([uid, net]) => uid !== me && net < 0)
     .map(([uid, net]) => ({
       uid,
       net: Math.abs(net),
-    }));
+    }))
+    .sort((a, b) => b.net - a.net);
 
-  // STEP 5: receive list
+  // ===============================
+  // STEP 6: Greedy Distribution
+  // ===============================
   return debtors.reduce((list, d) => {
     if (remaining <= 0) return list;
 
@@ -75,7 +112,7 @@ function buildReceiveList(expenses = [], members = [], currentUserId) {
 
     list.push({
       userId: d.uid,
-      name: member?.name ?? "User",
+      name: member?.name || "User",
       amount: Number(receive.toFixed(2)),
     });
 

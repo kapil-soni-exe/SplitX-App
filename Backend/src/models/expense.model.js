@@ -90,4 +90,6 @@ const expenseSchema = new mongoose.Schema(
   { timestamps: true },
 );
 
+expenseSchema.index({ groupId: 1, deletedAt: 1 });
+
 module.exports = mongoose.model("Expense", expenseSchema);
