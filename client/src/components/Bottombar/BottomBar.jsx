@@ -1,7 +1,7 @@
 
 import React from "react";
 import { NavLink } from "react-router-dom";
-import "./bottomBar.css";
+import "./BottomBar.css";
 import { mobileNavItem } from "./mobileNavItem";
 
 
