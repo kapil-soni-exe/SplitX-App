@@ -5,10 +5,10 @@ const {setIO} = require("./socketManager")
 
 function initSocket(server){
   const io = new Server(server,{
-     cors:{
-    origin:"http://localhost:5173",
-    credentials:true
-  }
+    cors:{
+      origin: process.env.CLIENT_ORIGIN || "http://localhost:5173",
+      credentials:true
+    }
   })
 
   setIO(io)
