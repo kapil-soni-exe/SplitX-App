@@ -1,6 +1,7 @@
 const Settlement = require("../models/settlement.model");
 const Group = require("../models/group.model");
 const { getPayList } = require("../services/groups.service");
+const createNotification = require("../services/notification/createNotification");
 
 // CREATE SETTLEMENT
 // POST /groups/:groupId/settlements
@@ -56,6 +57,18 @@ async function createSettlement(req, res) {
       amount: normalizedAmount,
       note,
       createdBy: from,
+    });
+
+    // Notify the user who received the payment
+    const payee = await Group.findOne({ _id: groupId }).populate("members.userId", "name").lean();
+    const groupName = payee ? payee.name : "a group";
+    
+    await createNotification({
+      userIds: [finalTo],
+      title: "Payment Received",
+      message: `${req.user.name} just settled ₹${normalizedAmount} with you in ${groupName}.`,
+      type: "settlement",
+      metadata: { groupId }
     });
 
     return res.status(201).json({

@@ -1,6 +1,7 @@
 const Group = require("../models/group.model");
 
 const { getIO } = require("../sockets/socketManager");
+const createNotification = require("../services/notification/createNotification");
 const crypto = require("crypto");
 
 const {
@@ -247,7 +248,6 @@ const joinGroup = async (req, res) => {
     await group.save();
 
     const io = getIO();
-
     io.to(group._id.toString()).emit("member-joined", {
       groupId: group._id,
       user: {
@@ -256,6 +256,20 @@ const joinGroup = async (req, res) => {
       },
       createdAt: new Date(),
     });
+
+    const existingMemberIds = group.members
+      .map(m => m.userId.toString())
+      .filter(id => id !== userId.toString());
+
+    if (existingMemberIds.length > 0) {
+      await createNotification({
+        userIds: existingMemberIds,
+        title: "New Member Joined",
+        message: `${req.user.name} just joined the group ${group.name}`,
+        type: "group",
+        metadata: { groupId: group._id }
+      });
+    }
 
     // Populate before sending response
     const populatedGroup = await Group.findById(group._id).populate(
