@@ -18,12 +18,14 @@ export const generateFcmToken = async () => {
     if (!registration) {
       registration = await navigator.serviceWorker.register(
         "/firebase-messaging-sw.js",
-        { updateViaCache: "none" }
+        { scope: "/", updateViaCache: "none" }
       );
     } else {
       // Force Android to bypass PWA cache and check for SW updates on every load
       await registration.update();
     }
+
+    console.log("Service Worker Registered with Scope:", registration.scope);
 
     const token = await getToken(messaging, {
       vapidKey: import.meta.env.VITE_FIREBASE_VAPID_KEY,

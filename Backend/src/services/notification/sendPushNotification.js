@@ -13,6 +13,16 @@ const sendPushNotification = async ({ tokens, title, body }) => {
         title,
         body
       },
+      android: {
+        priority: "high", // Critical for Android to wake up
+        notification: {
+          title,
+          body,
+          icon: "@mipmap/ic_launcher", // Default Android PWA icon
+          defaultSound: true,
+          defaultVibrateTimings: true
+        }
+      },
       webpush: {
         headers: {
           Urgency: "high"
@@ -21,7 +31,7 @@ const sendPushNotification = async ({ tokens, title, body }) => {
           title,
           body,
           icon: "/logo1.png",
-          requireInteraction: true,
+          requireInteraction: true // Requires user to dismiss it manually
         },
         fcm_options: {
           link: "https://splitx-app.vercel.app/" // Binds notification to PWA
