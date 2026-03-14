@@ -109,19 +109,19 @@ const Login = async (req, res) => {
 
     // WE Modifiy later, adding some cookies option
 
-    res.cookie("jwt_token", accessToken, {
-      httpOnly: true,
-      secure: process.env.NODE_ENV === "production",
-      sameSite: "strict",
-      maxAge: 15 * 60 * 1000,
-    });
+   res.cookie("jwt_token", accessToken, {
+  httpOnly: true,
+  secure: true,
+  sameSite: "none",
+  maxAge: 15 * 60 * 1000,
+});
 
-    res.cookie("refresh_token", refreshToken, {
-      httpOnly: true,
-      secure: process.env.NODE_ENV === "production",
-      sameSite: "strict",
-      maxAge: 7 * 24 * 60 * 60 * 1000,
-    });
+res.cookie("refresh_token", refreshToken, {
+  httpOnly: true,
+  secure: true,
+  sameSite: "none",
+  maxAge: 7 * 24 * 60 * 60 * 1000,
+});
 
     res.status(200).json({
       success: true,
@@ -213,12 +213,12 @@ const refresh = async (req, res) => {
     const newAccessToken = signToken(user._id);
 
     // update cookie
-    res.cookie("jwt_token", newAccessToken, {
-      httpOnly: true,
-      secure: process.env.NODE_ENV === "production",
-      sameSite: "strict",
-      maxAge: 15 * 60 * 1000,
-    });
+   res.cookie("jwt_token", newAccessToken, {
+  httpOnly: true,
+  secure: true,
+  sameSite: "none",
+  maxAge: 15 * 60 * 1000,
+});
 
     return res.status(200).json({
       success: true,
