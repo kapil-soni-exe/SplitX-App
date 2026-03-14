@@ -20,7 +20,7 @@ onMessage(messaging, (payload) => {
 
   console.log("Foreground notification:", payload);
 
-  const { title, body } = payload.notification;
+  const { title, body } = payload.data;
 
   new Notification(title, {
     body,
