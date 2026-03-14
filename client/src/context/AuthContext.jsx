@@ -8,6 +8,9 @@ import { logoutUser } from "../../api/auth.api";
 import apiClient from "../../api/apiClient";
 
 
+import { connectSocket, disconnectSocket } from "../sockets/socket";
+import { generateFcmToken } from "../utils/getFcmToken";
+
 export const AuthContext = createContext(null)
 export function AuthProvider({children}){
     const [user, setUser] = useState(null)
@@ -54,6 +57,16 @@ export function AuthProvider({children}){
     }
     loadMe()
    },[])
+
+   // Listen to `user` state to manage global connections
+   useEffect(() => {
+     if (user) {
+       connectSocket();
+       generateFcmToken();
+     } else {
+       disconnectSocket();
+     }
+   }, [user]);
 
     const logout = async () => {
     try {
