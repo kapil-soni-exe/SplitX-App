@@ -144,9 +144,10 @@ const logout = async (req, res) => {
   try {
     const refreshToken = req.cookies.refresh_token;
 
-    // clear both cookies
-    res.clearCookie("jwt_token");
-    res.clearCookie("refresh_token");
+    // clear both cookies — must use same options as when they were set
+    const cookieOpts = { httpOnly: true, secure: true, sameSite: "none" };
+    res.clearCookie("jwt_token", cookieOpts);
+    res.clearCookie("refresh_token", cookieOpts);
 
     // if no refresh token, just logout client-side
     if (!refreshToken) {
@@ -174,9 +175,10 @@ const logout = async (req, res) => {
     });
   } catch (err) {
     console.log(err);
-    // even if error, cookies clear
-    res.clearCookie("jwt_token");
-    res.clearCookie("refresh_token");
+    // even if error, cookies clear — same options as when they were set
+    const cookieOpts = { httpOnly: true, secure: true, sameSite: "none" };
+    res.clearCookie("jwt_token", cookieOpts);
+    res.clearCookie("refresh_token", cookieOpts);
 
     return res.status(200).json({
       success: true,

@@ -27,18 +27,25 @@ export function AuthProvider({children}){
             const res = await AuthMe()
             setUser(res.data.user)
         }catch(err){
-            // Access token likely expired - try a silent refresh
-            if(err.response?.status === 401){
+            const status = err.response?.status;
+
+            if(status === 401){
+                // Access token expired — try silent refresh
                 try {
                     await apiClient.post("/auth/refresh");
-                    // Refresh succeeded, retry to get user info
                     const retryRes = await AuthMe();
                     setUser(retryRes.data.user);
                 } catch (refreshErr) {
-                    // Refresh also failed - user truly not logged in
+                    // Refresh failed → truly not logged in
                     setUser(null);
                 }
+            } else if(status === 403){
+                // Forbidden (revoked token, etc.) — clear session
+                setUser(null);
             } else {
+                // Network error, server down, timeout, etc.
+                // Do NOT clear the user — keep whatever was there (null by default)
+                // This prevents PWA from logging out users on bad connections
                 setUser(null);
             }
         }finally{
