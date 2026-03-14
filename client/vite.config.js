@@ -14,7 +14,7 @@ export default defineConfig({
         description: "Smart expense splitting app",
         theme_color: "#0f172a",
         background_color: "#0f172a",
-        display: "standalone",
+        display: "fullscreen",
         start_url: "/",
         icons: [
           {

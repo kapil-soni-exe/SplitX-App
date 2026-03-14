@@ -20,6 +20,21 @@ html, body {
     background-color: var(--bg-main);
     color: var(--text-primary);
     overflow-x: hidden;
+    
+    /* PWA Full-screen and native feel additions */
+    -webkit-tap-highlight-color: transparent;
+    user-select: none;
+    -webkit-user-select: none;
+    padding-top: env(safe-area-inset-top);
+    padding-bottom: env(safe-area-inset-bottom);
+    padding-left: env(safe-area-inset-left);
+    padding-right: env(safe-area-inset-right);
+}
+
+/* Allow text selection only on standard input elements */
+input, textarea {
+    user-select: auto;
+    -webkit-user-select: auto;
 }
 
 a, button, input {

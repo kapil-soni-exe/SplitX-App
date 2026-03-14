@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react'
 import Sidebar from '../components/sidebar/Sidebar'
-import { Outlet } from 'react-router-dom'
+import { Outlet, useLocation } from 'react-router-dom'
+import { AnimatePresence } from 'framer-motion'
 import "./dashboardLayout.css"
 import Topbar from '../components/topbar/Topbar'
 import BottomBar from '../components/Bottombar/BottomBar'
@@ -9,6 +10,7 @@ import BottomBar from '../components/Bottombar/BottomBar'
 function DashboardLayout() {
 
   const [hideBottomBar, setHideBottomBar] = useState(false);
+  const location = useLocation();
 
 
 
@@ -40,6 +42,15 @@ useEffect(() => {
 
   useEffect(()=>{
     document.documentElement.setAttribute("data-theme",theme)
+    
+    // Dynamically update the theme-color meta tag for PWA
+    let metaThemeColor = document.querySelector("meta[name=theme-color]");
+    if (!metaThemeColor) {
+      metaThemeColor = document.createElement("meta");
+      metaThemeColor.name = "theme-color";
+      document.head.appendChild(metaThemeColor);
+    }
+    metaThemeColor.content = theme === "dark" ? "#111113" : "#EDF0F8";
 
   }, [theme])
   return (
@@ -49,7 +60,11 @@ useEffect(() => {
      <div className="dashboard-main">
           <Topbar theme={theme} themeToggle={themeToggle} />
         <main className='dashboard-content'>
-            <Outlet context={{ setHideBottomBar }}/>
+          <AnimatePresence mode="wait">
+            <React.Fragment key={location.pathname}>
+              <Outlet context={{ setHideBottomBar }}/>
+            </React.Fragment>
+          </AnimatePresence>
         </main>
 
         {isMobile && !hideBottomBar && <BottomBar />}

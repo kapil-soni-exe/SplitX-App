@@ -9,6 +9,7 @@ import Group from "../pages/Group_Page/Group";
 import InviteCheck from "../pages/Group_Page/components/GroupList/InviteCheck";
 import ProtectedRoute from "../components/ProtectedRoute";
 import ProfilePage from "../pages/Profile_Page/ProfilePage";
+import PageTransition from "../components/PageTransition";
 
 export const router = createBrowserRouter([
   {
@@ -31,7 +32,9 @@ export const router = createBrowserRouter([
         path: "dashboard",
         element: (
           <ProtectedRoute>
-            <Dashboard />
+            <PageTransition>
+              <Dashboard />
+            </PageTransition>
           </ProtectedRoute>
         ),
       },
@@ -40,7 +43,9 @@ export const router = createBrowserRouter([
         path: "groups",
         element: (
           <ProtectedRoute>
-            <Group />
+            <PageTransition>
+              <Group />
+            </PageTransition>
           </ProtectedRoute>
         ),
       },
@@ -48,7 +53,9 @@ export const router = createBrowserRouter([
         path:"profile",
         element:(
           <ProtectedRoute>
-            <ProfilePage/>
+            <PageTransition>
+              <ProfilePage/>
+            </PageTransition>
           </ProtectedRoute>
         )
       }
