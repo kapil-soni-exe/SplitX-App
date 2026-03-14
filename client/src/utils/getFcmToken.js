@@ -17,8 +17,12 @@ export const generateFcmToken = async () => {
 
     if (!registration) {
       registration = await navigator.serviceWorker.register(
-        "/firebase-messaging-sw.js"
+        "/firebase-messaging-sw.js",
+        { updateViaCache: "none" }
       );
+    } else {
+      // Force Android to bypass PWA cache and check for SW updates on every load
+      await registration.update();
     }
 
     const token = await getToken(messaging, {

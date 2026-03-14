@@ -65,6 +65,24 @@ const createExpense = async (data, user) => {
   },
 });
 
+  // Notification for Group Members
+  const targetGroup = await Group.findById(groupId).select("members").lean();
+  if (targetGroup && targetGroup.members) {
+    const notifyIds = targetGroup.members
+      .map((m) => m.userId.toString())
+      .filter((id) => id !== user._id.toString()); // don't notify the person who added it
+
+    if (notifyIds.length > 0) {
+      const createNotification = require("../notification/createNotification");
+      await createNotification({
+        userIds: notifyIds,
+        title: "New Expense Added",
+        message: `${user.name} added "${populatedExpense.title}" (₹${populatedExpense.amount}) in your group.`,
+        type: "expense",
+        metadata: { groupId, expenseId: populatedExpense._id }
+      });
+    }
+  }
 
   return populatedExpense;
 };
