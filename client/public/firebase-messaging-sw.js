@@ -13,7 +13,7 @@ const messaging = firebase.messaging();
 
 messaging.onBackgroundMessage((payload) => {
 
-  const { title, body } = payload.data;
+  const { title, body } = payload.notification;
 
   const options = {
     body,
