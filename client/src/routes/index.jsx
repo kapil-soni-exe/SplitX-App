@@ -1,5 +1,5 @@
 import { createBrowserRouter } from "react-router-dom";
-import Landing from "../landing/Landing";
+import RootRedirect from "../components/RootRedirect";
 import Login from "../auth/Login";
 import Signup from "../auth/Signup";
 import AuthLayout from "../auth/AuthLayout";
@@ -14,7 +14,7 @@ import PageTransition from "../components/PageTransition";
 export const router = createBrowserRouter([
   {
     path: "/",
-    element: <Landing />,
+    element: <RootRedirect />,
   },
   {
     element: <AuthLayout />,
