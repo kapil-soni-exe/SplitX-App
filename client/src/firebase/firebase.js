@@ -24,7 +24,10 @@ onMessage(messaging, (payload) => {
 
   new Notification(title, {
     body,
-    icon: "/logo1.png"
+    icon: "/logo1.png",
+    data: {
+      url: "/"
+    }
   });
 
 });

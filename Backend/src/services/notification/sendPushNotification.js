@@ -12,6 +12,20 @@ const sendPushNotification = async ({ tokens, title, body }) => {
       notification: {
         title,
         body
+      },
+      webpush: {
+        headers: {
+          Urgency: "high"
+        },
+        notification: {
+          title,
+          body,
+          icon: "/logo1.png",
+          requireInteraction: true,
+        },
+        fcm_options: {
+          link: "https://splitx-app.vercel.app/" // Binds notification to PWA
+        }
       }
     };
 
