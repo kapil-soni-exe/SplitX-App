@@ -15,7 +15,8 @@ import ExpenseDate from "./components/ExpenseDate";
 
  * All logic is handled inside useExpenseForm hook.
  */
-function AddExpenseForm({ members = [], groupId, onAddExpense }) {
+function AddExpenseForm({ members = [], groupId, onAddExpense, initialData = null, 
+  isEdit = false    }) {
   const {
     formInput,
     setFormInput,
@@ -24,7 +25,7 @@ function AddExpenseForm({ members = [], groupId, onAddExpense }) {
     isSubmitDisabled,
     submitErrorReason,
     isSuspiciousAmount
-  } = useExpenseForm({ groupId, onAddExpense });
+  } = useExpenseForm({ groupId, onAddExpense,initialData,isEdit });
 
   return (
     <form className="add-expense-form" onSubmit={handleSubmit}>

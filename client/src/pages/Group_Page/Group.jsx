@@ -6,6 +6,7 @@ import { useOutletContext } from "react-router-dom";
 import GroupInfo from "./components/GroupInfo/GroupInfo";
 import { useAuth } from "../../context/AuthContext";
 import { useGroupManager } from "../../hooks/useGroupManager";
+import Spinner from "../../components/Loaders/Spinner";
 
 function Group() {
   const { groups, selectedGroupId, selectGroup, addGroup, fetchGroups,handleGroupLeft } =
@@ -58,7 +59,7 @@ function Group() {
             onExpenseCreated={fetchGroups}
           />
         ) : (
-          <div className="group-loading">Loading group…</div>
+          <Spinner/>
         )}
       </div>
 

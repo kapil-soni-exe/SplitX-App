@@ -88,6 +88,7 @@
   border: 1px solid var(--border);
   color: var(--text-primary);
   font-weight: 400;
+  border-top-left-radius: 4px;
 
 }
 
@@ -101,6 +102,7 @@
   );
   color: #ffff;
   font-weight: 400;
+  border-top-right-radius: 4px;
 }
 
 /* FOOTER */
@@ -169,8 +171,72 @@
   color: var(--text-primary);
 }
 .chat-note{
-  color: var(--text-secondary);
+  color: var(--text-primary);
   font-style: italic;
+}
+
+/* ============================= */
+/* DELETED EXPENSE (CHAT STYLE) */
+/* ============================= */
+
+.chat-message.deleted {
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid var(--border);
+  box-shadow: none;
+
+  color: var(--text-muted);
+  font-size: 0.75rem;
+
+  opacity: 0.8;
+}
+
+/* incoming deleted */
+.chat-message.deleted.incoming {
+  align-self: flex-start;
+  border-top-left-radius: 4px;
+}
+
+/* outgoing deleted */
+.chat-message.deleted.outgoing {
+  align-self: flex-end;
+  border-top-right-radius: 4px;
+}
+.chat-paidby {
+  font-size: 12px;
+  opacity: 0.7;
+  margin-top: 2px;
+}
+
+/* deleted text */
+.deleted-text {
+  padding: 2px 0;
+  font-style: normal; 
+}
+
+/* time text */
+.chat-message.deleted .chat-time {
+  font-size: 0.6rem;
+  opacity: 0.5;
+}
+
+.chat-system-pill {
+  align-self: center;
+
+  font-size: 0.65rem;
+  font-weight: 600;
+
+  padding: 0.25rem 0.7rem;
+  margin: 0.6rem 0;
+
+  border-radius: 999px;
+
+  background: var(--card-alpha);
+  border: 1px solid var(--glass-border);
+
+  color: var(--text-muted);
+
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
 }
 
 @media (max-width: 768px) {

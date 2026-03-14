@@ -3,20 +3,43 @@ import "./GroupInfo.css";
 import { RiArrowLeftCircleLine } from "@remixicon/react";
 import { useGroupDetail } from "../../../../hooks/useGroupDetail";
 import InviteSuccess from "../GroupList/InviteLink";
+import { leaveGroup } from "../../../../../api/group.api";
+import { useNavigate } from "react-router-dom";
+import ConfirmModal from "../../../../components/comman/ConfirmModel";
+import { useState } from "react";
+import Spinner from "../../../../components/Loaders/Spinner";
 
-function GroupInfo({ groupId, onBack }) {
+function GroupInfo({ groupId, onBack,onGroupLeft,onCloseChat  }) {
+  const [showLeaveModal, setShowLeaveModal] = useState(false);
   const { group, loading } = useGroupDetail(groupId);
 
-  // Admin Check
-  const isAdmin = (memberId) => {
-    return (
-    memberId?.toString() === group.createdBy?._id?.toString()
-  );
-  };
 
-  
+  /**
+   * Check if member is admin
+   * Now member object contains userId
+   */
+const isAdmin = (memberId) => {
+  if (!group) return false;
+  const adminId = group.admin?._id || group.admin;
+  return memberId?.toString() === adminId?.toString();
+};
+
+ const handleExitGroup = async () => {
+  try {
+    await leaveGroup(groupId);
+    onGroupLeft(); 
+    onCloseChat(); 
+    onBack(); 
+    setShowLeaveModal(false);
+    
+
+  } catch (err) {
+    console.error("Leave group failed", err);
+  }
+};
+
   if (loading) {
-    return <div className="group-loading">Loading group info…</div>;
+    return <Spinner/>
   }
 
   if (!group) {
@@ -39,34 +62,62 @@ function GroupInfo({ groupId, onBack }) {
 
         <h2>{group.name}</h2>
         <p>{group.members.length} members</p>
+
         <InviteSuccess
-          inviteLink={`${window.location.origin}/join/${group.inviteCode}`}
+          inviteLink={`${window.location.origin}/invite/${group.inviteCode}`}
         />
       </div>
 
       {/* MEMBERS */}
       <div className="group-info-members">
         <div className="members-header">Members</div>
-        <div className="members-scroll">
-          {group.members.map((m) => (
-            <div key={m._id} className="group-info-member">
-              <div className="member-avatar">{m.name[0]}</div>
-              <div className="member-info">
-                <span className="member-name">{m.name}</span>
 
-                {isAdmin(m._id) && <span className="admin-badge">Admin</span>}
+        <div className="members-scroll">
+          {group.members.map((member) => {
+            const user = member.userId; // new structure
+
+            if (!user) return null;
+
+            return (
+              <div key={user._id} className="group-info-member">
+                <div className="member-avatar">
+                  {user.name?.[0]}
+                </div>
+
+                <div className="member-info">
+                  <span className="member-name">
+                    {user.name}
+                  </span>
+
+                  {isAdmin(user._id) && (
+                    <span className="admin-badge">
+                      Admin
+                    </span>
+                  )}
+                </div>
               </div>
-            </div>
-          ))}
+            );
+          })}
         </div>
       </div>
 
       {/* ACTIONS */}
       <div className="group-info-actions">
         <button className="mute-btn">Mute notifications</button>
-        <button className="exit-btn">Exit group</button>
+        <button className="exit-btn" onClick={()=>setShowLeaveModal(true)}>Exit group</button>
       </div>
+      <ConfirmModal
+  isOpen={showLeaveModal}
+  title="Leave Group"
+  description="Are you sure you want to leave this group?"
+  confirmText="Leave"
+  cancelText="Cancel"
+  confirmVariant="danger"
+  onConfirm={handleExitGroup}
+  onCancel={() => setShowLeaveModal(false)}
+/>
     </div>
+    
   );
 }
 

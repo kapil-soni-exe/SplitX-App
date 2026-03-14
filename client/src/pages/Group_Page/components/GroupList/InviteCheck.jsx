@@ -81,9 +81,9 @@ const handleJoin = async () => {
       You’ve been invited to join a group
     </p>
 
-    <p className="invite-group-name">{group.name}</p>
+    <p className="invite-group-name">{group?.name}</p>
     <p className="invite-members">
-      {group.membersCount} participants
+      {group?.membersCount} participants
     </p>
 
    <Button className="invite-join-btn"

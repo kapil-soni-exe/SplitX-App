@@ -1,10 +1,18 @@
 /**
  * PaidBySelect
  * -----------------
- * Handles selection of the user who paid the expenses
+ * Handles selection of the user who paid the expense
  *
+ * Note:
+ * members now have structure:
+ *
+ * {
+ *   userId: { _id, name, avatar },
+ *   joinedAt: Date
+ * }
  */
-function PaidBySelect({ members, paidBy, setFormInput }) {
+
+function PaidBySelect({ members = [], paidBy, setFormInput }) {
   return (
     <div className="form-field">
       <label>Paid By</label>
@@ -21,11 +29,18 @@ function PaidBySelect({ members, paidBy, setFormInput }) {
       >
         <option value="">Select user</option>
 
-        {members.map((member) => (
-          <option key={member._id} value={member._id}>
-            {member.name}
-          </option>
-        ))}
+        {members.map((member) => {
+          const user = member.userId;
+
+          // safety check in case userId not populated
+          if (!user) return null;
+
+          return (
+            <option key={user._id} value={user._id}>
+              {user.name}
+            </option>
+          );
+        })}
       </select>
     </div>
   );

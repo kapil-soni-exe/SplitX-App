@@ -4,8 +4,16 @@ import "./ExpenseDetail.css";
 function ExpenseDetail({ expense, currentUser, onEdit, onDelete }) {
   if (!expense || !currentUser) return null;
 
+  
+
   const isPaidByMe =
     expense.paidBy?._id?.toString() === currentUser?._id?.toString();
+
+  // ✅ creator check
+  const isCreator =
+    expense.createdBy?._id?.toString() === currentUser?.id?.toString();
+
+    console.log(isCreator)
 
   return (
     <div className="expense-detail">
@@ -50,24 +58,26 @@ function ExpenseDetail({ expense, currentUser, onEdit, onDelete }) {
         </div>
       )}
 
-      {/* ACTIONS */}
-      <div className="expense-actions">
-        <button
-          type="button"
-          className="edit-action"
-          onClick={() => onEdit?.(expense)}
-        >
-          Edit expense
-        </button>
+      {/* ACTIONS (ONLY FOR CREATOR) */}
+      {isCreator && (
+        <div className="expense-actions">
+          <button
+            type="button"
+            className="edit-action"
+            onClick={() => onEdit?.(expense)}
+          >
+            Edit expense
+          </button>
 
-        <button
-          type="button"
-          className="delete-action"
-          onClick={() => onDelete?.(expense)}
-        >
-          Delete
-        </button>
-      </div>
+          <button
+            type="button"
+            className="delete-action"
+            onClick={() => onDelete?.(expense)}
+          >
+            Delete
+          </button>
+        </div>
+      )}
     </div>
   );
 }
