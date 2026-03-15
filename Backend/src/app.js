@@ -12,9 +12,11 @@ const cors = require("cors");
 const app = express();
 app.use(express.json());
 
+const allowedOrigins = process.env.CLIENT_ORIGIN.split(",");
+
 app.use(
   cors({
-    origin: process.env.CLIENT_ORIGIN || "http://localhost:5173",
+    origin: allowedOrigins,
     credentials: true,
   })
 );
