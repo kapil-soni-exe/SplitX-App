@@ -6,13 +6,7 @@ export const loginUser = (data) => {
 export const registerUser = (data) => {
   return apiClient.post("/auth/register", data);
 };
-export const verifyEmailOtp = (data) => {
-  return apiClient.post("/auth/verify-email", data);
-};
 
-export const resendOtp = (data) => {
-  return apiClient.post("/auth/resend-otp", data);
-};
 export const logoutUser = () => {
   return apiClient.post("/auth/logout");
 };

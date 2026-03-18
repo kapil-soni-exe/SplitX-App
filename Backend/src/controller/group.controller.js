@@ -1,4 +1,6 @@
 const Group = require("../models/group.model");
+const Expense = require("../models/expense.model");
+const Settlement = require("../models/settlement.model");
 
 const { getIO } = require("../sockets/socketManager");
 const createNotification = require("../services/notification/createNotification");
@@ -6,13 +8,13 @@ const crypto = require("crypto");
 
 const {
   getGroupTotalSpent,
-  getUserPaid,
-  getUserShare,
-  getPayList,
-  getReceiveList,
-  getExpensesCount,
   getUserNetBalance,
 } = require("../services/groups.service");
+const calculateTotalSpent = require("../services/calculation/calculateTotalSpent");
+const calculateUserPaid = require("../services/calculation/calculateUserPaid");
+const calculateUserShare = require("../services/calculation/calculateUserShare");
+const buildPayList = require("../services/calculation/buildPayList");
+const buildReceiveList = require("../services/calculation/buildReceiveList");
 
 /* 
    Utility: Generate random invite code for groups
@@ -84,9 +86,8 @@ const createGroup = async (req, res) => {
   }
 };
 
-/* 
-   Fetch all groups where user is a member
- */
+// Get all the group
+
 const getAllgroup = async (req, res) => {
   try {
     const userId = req.user.id;
@@ -95,9 +96,10 @@ const getAllgroup = async (req, res) => {
       "members.userId": userId,
       isArchived: false,
     })
-      // Populate user details inside members.userId
+      .select("name members lastExpense createdBy") // only required fields
       .populate("members.userId", "name email avatar")
-      .populate("createdBy", "name email");
+      .populate("createdBy", "name email")
+      .lean(); // IMPORTANT
 
     res.status(200).json({
       success: true,
@@ -112,7 +114,6 @@ const getAllgroup = async (req, res) => {
     });
   }
 };
-
 /*
    Get single group by ID */
 const getGroupbyId = async (req, res) => {
@@ -120,8 +121,7 @@ const getGroupbyId = async (req, res) => {
     const { groupId } = req.params;
     const userId = req.user.id;
 
-    // Access control:
-    // user must be member of the group
+    // Access control
     const group = await Group.findOne({
       _id: groupId,
       "members.userId": userId,
@@ -138,22 +138,39 @@ const getGroupbyId = async (req, res) => {
       });
     }
 
-    // Fetch financial summary in parallel
-    const [
-      totalSpent,
-      userPaid,
-      userShare,
-      payList,
-      receiveList,
-      expenseCount,
-    ] = await Promise.all([
-      getGroupTotalSpent(group._id),
-      getUserPaid(group._id, userId),
-      getUserShare(group._id, userId),
-      getPayList(group._id, userId),
-      getReceiveList(group._id, userId),
-      getExpensesCount(group._id),
+    // Fetch expenses & settlements once
+    const [expenses, settlements] = await Promise.all([
+      Expense.find({
+        groupId,
+        deletedAt: null,
+      })
+        .select("amount paidBy splitType splits")
+        .lean(),
+
+      Settlement.find({
+        groupId,
+      })
+        .select("from to amount")
+        .lean(),
     ]);
+
+    // Members
+    const members = group.members.map((m) => m.userId);
+
+    // Calculations (same functions)
+    const totalSpent = calculateTotalSpent(expenses);
+
+    const userPaid = calculateUserPaid(
+      expenses.filter((e) => e.paidBy.toString() === userId.toString())
+    );
+
+    const userShare = calculateUserShare(expenses, userId);
+
+    const payList = buildPayList(expenses, settlements, members, userId);
+
+    const receiveList = buildReceiveList(expenses, settlements, members, userId);
+
+    const expenseCount = expenses.length;
 
     const totalOwed = payList.reduce((sum, p) => sum + p.amount, 0);
     const totalReceive = receiveList.reduce((sum, r) => sum + r.amount, 0);
@@ -172,6 +189,7 @@ const getGroupbyId = async (req, res) => {
         expenseCount,
       },
     });
+
   } catch (err) {
     console.error("Get group by id error:", err);
 

@@ -27,32 +27,8 @@ const userSchema = new mongoose.Schema(
     },
     isVerified: {
       type: Boolean,
-      default: false,
+      default: true,
     },
-    emailOtpHash: {
-      type: String,
-    },
-    emailOtpExpiresAt: {
-      type: Date,
-    },
-    emailOtpAttempts: {
-      type: Number,
-      default: 0,
-    },
-
-    otpLastSentAt: {
-      type: Date,
-    },
-
-    otpResendCount: {
-      type: Number,
-      default: 0,
-    },
-
-    otpResendWindowStart: {
-      type: Date,
-    },
-
     refreshToken: String,
 
     fcmToken: {

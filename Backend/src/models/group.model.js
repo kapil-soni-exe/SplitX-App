@@ -116,4 +116,7 @@ const groupSchema = new mongoose.Schema(
 
 const groupModel = mongoose.model("Group", groupSchema);
 
+
+groupSchema.index({ "members.userId": 1, isArchived: 1 });
+
 module.exports = groupModel;
