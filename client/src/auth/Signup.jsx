@@ -14,7 +14,7 @@ function Signup() {
 
       <RegisterForm
         onSuccess={() => {
-          navigate("/login");
+          navigate("/dashboard");
         }}
       />
     </div>
