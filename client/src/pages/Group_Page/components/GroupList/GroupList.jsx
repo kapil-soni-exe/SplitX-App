@@ -1,5 +1,7 @@
 import React, { useState } from "react";
 import "./GroupList.css";
+import EmptyState from "../../../../components/comman/EmptyState";
+import {RiGroupLine} from "@remixicon/react"
 
 import {
   getLastActivity,
@@ -127,39 +129,51 @@ function GroupList({
         </Modal>
 
         {/* Render groups */}
-        {visibleSearch.map((group) => {
-          const isActive = group._id === selectedGroupId;
+        {visibleSearch.length === 0 ? (
+          <EmptyState
+            title={search ? "No groups found" : "No groups yet"}
+            description={
+              search
+                ? `No group matches "${search}". Try a different name.`
+                : "Your split journey starts here! Create a group to begin tracking shared expenses."
+            }
+            icon={<RiGroupLine size={80} />}
+          />
+        ) : (
+          visibleSearch.map((group) => {
+            const isActive = group._id === selectedGroupId;
 
-          return (
-            <div
-              key={group._id}
-              className={`group-list-item ${isActive ? "active" : ""}`}
-              onClick={() => onSelectGroup(group._id)}
-            >
-              {/* group avatar */}
-              <div className="group-avatar">{group.name[0]}</div>
+            return (
+              <div
+                key={group._id}
+                className={`group-list-item ${isActive ? "active" : ""}`}
+                onClick={() => onSelectGroup(group._id)}
+              >
+                {/* group avatar */}
+                <div className="group-avatar">{group.name[0]}</div>
 
-              <div className="group-info">
-                {/* group name */}
-                <p className="group-name">{group.name}</p>
+                <div className="group-info">
+                  {/* group name */}
+                  <p className="group-name">{group.name}</p>
 
-                {/* last activity preview */}
-                <span className="group-meta">
-                  <span className="group-preview-text">
-                    {group.lastExpense
-                      ? getLastActivity(group, currentUser?.id)
-                      : "No activity yet"}
+                  {/* last activity preview */}
+                  <span className="group-meta">
+                    <span className="group-preview-text">
+                      {group.lastExpense
+                        ? getLastActivity(group, currentUser?.id)
+                        : "No activity yet"}
+                    </span>
+
+                    {/* activity time */}
+                    <span className="group-last-time">
+                      {getLastActivityTime(group)}
+                    </span>
                   </span>
-
-                  {/* activity time */}
-                  <span className="group-last-time">
-                    {getLastActivityTime(group)}
-                  </span>
-                </span>
+                </div>
               </div>
-            </div>
-          );
-        })}
+            );
+          })
+        )}
       </div>
     </div>
   );

@@ -1,8 +1,9 @@
 import React, { useState } from "react";
 import "./ToReceive.css";
-import { RiArrowRightSLine } from "@remixicon/react";
 import SettlementSelector from "../To_Pay/SettlementSelector";
 import Model from "../../../../components/comman/Model";
+import EmptyState from "../../../../components/comman/EmptyState";
+import { RiCheckDoubleLine, RiArrowRightSLine } from "@remixicon/react";
 
 function ToReceive({ receiveList = [], onConfirmCollection }) {
   const [isOpen, setIsOpen] = useState(false);
@@ -22,9 +23,11 @@ function ToReceive({ receiveList = [], onConfirmCollection }) {
 
         <div className="receive-body">
           {receiveList.length === 0 ? (
-            <div className="receive-empty">
-              🎉 Nothing to collect here!
-            </div>
+            <EmptyState
+              title="Nothing to collect"
+              description="No one owes you in this group right now. Time to start a new expense?"
+              icon={<RiCheckDoubleLine size={80} />}
+            />
           ) : (
             receiveList.map((person) => (
               <div

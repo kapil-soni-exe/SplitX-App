@@ -12,7 +12,7 @@ export function useDashboard() {
   // Load group detail (reusable)
   const loadGroup = useCallback(async (groupId) => {
     try {
-      
+      setLoading(true);
       const res = await FetchGroupbyId(groupId);
       setGroup(res.data.data);
     } catch (err) {

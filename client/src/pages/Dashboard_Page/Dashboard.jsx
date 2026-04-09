@@ -13,6 +13,9 @@ import { useGroupSettlement } from "../../hooks/useGroupSettlement";
 import Spinner from "../../components/Loaders/Spinner";
 import DashboardSkeleton from "../../components/Loaders/DashboardSkeleton";
 
+import EmptyState from "../../components/comman/EmptyState";
+import { RiGroupLine } from "@remixicon/react";
+
 function Dashboard() {
   const {
     groups,
@@ -25,9 +28,22 @@ function Dashboard() {
   } = useDashboard();
   const { handleCreateSettlement } = useGroupSettlement(selectedGroupId);
 
-  if (loading) return <DashboardSkeleton/>;
+  if (loading) return <DashboardSkeleton />;
   if (error) return <div>Something went wrong</div>;
-  if (!group) return <div>No group data</div>;
+
+  if (!group || groups.length === 0) {
+    return (
+      <EmptyState
+        title="No groups found"
+        description="Your split journey starts here! Create a group to begin tracking shared expenses with friends."
+        icon={<RiGroupLine size={80} />}
+        cta={{
+          text: "Create Your First Group",
+          onClick: () => (window.location.href = "/groups"),
+        }}
+      />
+    );
+  }
 
   const {
     name,

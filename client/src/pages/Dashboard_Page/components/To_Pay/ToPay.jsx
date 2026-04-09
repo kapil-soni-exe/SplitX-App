@@ -1,8 +1,10 @@
 import React, { useState } from "react";
-import { RiArrowRightSLine } from "@remixicon/react";
 import SettlementSelector from "./SettlementSelector";
 import "./ToPay.css";
 import Model from "../../../../components/comman/Model"
+import EmptyState from "../../../../components/comman/EmptyState";
+import { RiCheckDoubleLine, RiArrowRightSLine } from "@remixicon/react";
+
 function ToPay({ payList = [], onConfirmSettlement }) {
   const [isOpen, setIsOpen] = useState(false);
 
@@ -21,9 +23,11 @@ function ToPay({ payList = [], onConfirmSettlement }) {
 
         <div className="pay-body">
           {payList.length === 0 ? (
-            <div className="pay-empty">
-              🎉 You don't need to pay anyone in this group!
-            </div>
+            <EmptyState
+              title="All Settled!"
+              description="You don't owe anyone in this group. Coffee on you? ☕"
+              icon={<RiCheckDoubleLine size={80} />}
+            />
           ) : (
             payList.map((person) => (
               <div key={person.userId} className="pay-row">

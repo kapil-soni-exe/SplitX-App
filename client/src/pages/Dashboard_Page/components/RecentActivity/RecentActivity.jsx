@@ -1,14 +1,28 @@
 import React from 'react'
 import { getRecentActivities } from '../../../../utils/getRecentActivities'
 import "./Activites.css"
+import EmptyState from "../../../../components/comman/EmptyState";
+import { RiHistoryLine } from "@remixicon/react";
 
-function RecentActivity({groups}) {
+function RecentActivity({ groups }) {
+  const activities = getRecentActivities(groups);
 
-const activities = getRecentActivities(groups)
-console.log("groups:", groups);
+  if (activities.length === 0) {
+    return (
+      <div className="recent-card">
+        <div className="recent-header">
+          <h3>Recent Activity</h3>
+          <p>Across all groups</p>
+        </div>
+        <EmptyState
+          title="No activity yet"
+          description="Tumbleweeds... No recent expenses or activities found in your groups."
+          icon={<RiHistoryLine size={80} />}
+        />
+      </div>
+    );
+  }
 
-
-  console.log(activities)
   return (
     <div className="recent-card">
       <div className="recent-header">

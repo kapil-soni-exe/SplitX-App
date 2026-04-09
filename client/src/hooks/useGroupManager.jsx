@@ -32,9 +32,9 @@ export function useGroupManager() {
   };
 
   const handleGroupLeft = async () => {
-  await fetchGroups();
-  selectGroup(null);
-};
+    selectGroup(null);
+    await fetchGroups();
+  };
 
   return {
     groups,
