@@ -1,5 +1,5 @@
 import React from "react";
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import RegisterForm from "./RegisterForm";
 
 function Signup() {
@@ -8,8 +8,12 @@ function Signup() {
   return (
     <div className="login-content">
       <div className="login-heading">
-        <h1>Create your account</h1>
-        <p>Start splitting expenses with ease</p>
+        <div className="mobile-logo-wrapper">
+          <img src="/logo1.png" alt="SplitX Logo" className="mobile-auth-logo light-logo" />
+          <img src="/logo-light.png" alt="SplitX Logo" className="mobile-auth-logo dark-logo" />
+        </div>
+        <h1>Create an account</h1>
+        <p>Join SplitX to start tracking shared expenses</p>
       </div>
 
       <RegisterForm
@@ -17,6 +21,11 @@ function Signup() {
           navigate("/dashboard");
         }}
       />
+
+      <p className="auth-switch">
+        Already have an account?{" "}
+        <Link to="/login" className="auth-link">Log in</Link>
+      </p>
     </div>
   );
 }
