@@ -11,7 +11,7 @@
  */
 
 import Model from "./Model";
-import "./ConfirmModel.css"
+import "./ConfirmModel.css";
 
 function ConfirmModal({
   isOpen,
@@ -31,15 +31,12 @@ function ConfirmModal({
         {description && <p>{description}</p>}
 
         <div className="confirm-actions">
-          <button
-            className="chat-secondary-btn"
-            onClick={onCancel}
-          >
+          <button className="confirm-btn-secondary" onClick={onCancel}>
             {cancelText}
           </button>
 
           <button
-            className={`chat-primary-btn ${confirmVariant}`}
+            className={`confirm-btn-primary ${confirmVariant}`}
             onClick={onConfirm}
           >
             {confirmText}
