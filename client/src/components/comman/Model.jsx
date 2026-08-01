@@ -1,20 +1,49 @@
-import { useEffect } from "react";
+import { useEffect, useRef } from "react";
 import { createPortal } from "react-dom";
 import { RiCloseCircleLine } from "@remixicon/react";
 import "./Model.css";
 
+// Module-level reference-counting for body scroll lock
+let openModalCount = 0;
+
 function Modal({ isOpen, onClose, children, variant = "center" }) {
-  // Prevent background scroll
+  const modalRef = useRef(null);
+
+  // Safe reference-counted body scroll lock
   useEffect(() => {
     if (isOpen) {
+      openModalCount++;
       document.body.style.overflow = "hidden";
-    } else {
-      document.body.style.overflow = "auto";
     }
 
     return () => {
-      document.body.style.overflow = "auto";
+      if (isOpen) {
+        openModalCount--;
+        if (openModalCount <= 0) {
+          document.body.style.overflow = "auto";
+          openModalCount = 0;
+        }
+      }
     };
+  }, [isOpen]);
+
+  // Close modal on Escape key press
+  useEffect(() => {
+    if (!isOpen) return;
+
+    const handleEscape = (e) => {
+      if (e.key === "Escape") onClose();
+    };
+
+    document.addEventListener("keydown", handleEscape);
+    return () => document.removeEventListener("keydown", handleEscape);
+  }, [isOpen, onClose]);
+
+  // Initial focus management on open
+  useEffect(() => {
+    if (isOpen && modalRef.current) {
+      modalRef.current.focus();
+    }
   }, [isOpen]);
 
   if (!isOpen) return null;
@@ -23,19 +52,54 @@ function Modal({ isOpen, onClose, children, variant = "center" }) {
     <div className="modal-backdrop" onClick={onClose}>
       {variant === "center" && (
         <div
+          ref={modalRef}
+          tabIndex={-1}
           className="modal-box"
+          role="dialog"
+          aria-modal="true"
+          aria-label="Dialog"
           onClick={(e) => e.stopPropagation()}
         >
           <RiCloseCircleLine
+            tabIndex={0}
+            role="button"
+            aria-label="Close dialog"
             className="close-btn"
             onClick={onClose}
+            onKeyDown={(e) => {
+              if (e.key === "Enter" || e.key === " ") {
+                e.preventDefault();
+                onClose();
+              }
+            }}
           />
           {children}
         </div>
       )}
 
       {variant === "drawer" && (
-        <div onClick={(e) => e.stopPropagation()}>
+        <div
+          ref={modalRef}
+          tabIndex={-1}
+          className="modal-drawer"
+          role="dialog"
+          aria-modal="true"
+          aria-label="Dialog"
+          onClick={(e) => e.stopPropagation()}
+        >
+          <RiCloseCircleLine
+            tabIndex={0}
+            role="button"
+            aria-label="Close dialog"
+            className="close-btn"
+            onClick={onClose}
+            onKeyDown={(e) => {
+              if (e.key === "Enter" || e.key === " ") {
+                e.preventDefault();
+                onClose();
+              }
+            }}
+          />
           {children}
         </div>
       )}
