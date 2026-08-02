@@ -30,8 +30,8 @@ function Sidebar() {
   return (
     <aside className="sidebar">
       <div className="sidebar-logo">
-        <img src="/logo1.png" alt="auth-log" className='logo light' />
-        <img src="/logo-light.png" alt="auth-log" className='logo dark' />
+        <img src="/logo1.png" alt="SplitX Logo" className="logo light" />
+        <img src="/logo-light.png" alt="SplitX Logo" className="logo dark" />
       </div>
 
       <nav className="sidebar-nav">
