@@ -1,19 +1,10 @@
+import React from "react";
+import { RiCheckLine } from "@remixicon/react";
+
 /**
  * SplitMembersList
- * Renders the list of members involved in the split.
- *
- * Responsibilities:
- * - Checkbox selection for split members
- * - Show equal split preview OR unequal input
- * - Highlight paid-by member
- *
- * members structure:
- * {
- *   userId: { _id, name, avatar },
- *   joinedAt: Date
- * }
+ * Renders member avatar-chips for split selection.
  */
-
 function SplitMembersList({
   members = [],
   formInput,
@@ -21,83 +12,93 @@ function SplitMembersList({
   equalAmount,
 }) {
   return (
-    <div className="split-list">
+    <div className="split-members-grid">
       {members.map((member) => {
-
         const user = member.userId;
-
-        // safety check if userId not populated
         if (!user) return null;
 
         const memberId = user._id;
-
         const checked = formInput.splitBetween.includes(memberId);
         const isPaidBy = formInput.paidBy === memberId;
+        const initialLetter = user.name ? user.name.charAt(0).toUpperCase() : "?";
+
+        const handleToggle = () => {
+          const isChecked = !checked;
+
+          setFormInput((prev) => ({
+            ...prev,
+            splitBetween: isChecked
+              ? [...prev.splitBetween, memberId]
+              : prev.splitBetween.filter((id) => id !== memberId),
+
+            // Remove split amount when unchecked
+            splits: isChecked
+              ? prev.splits
+              : Object.fromEntries(
+                  Object.entries(prev.splits).filter(
+                    ([id]) => id !== memberId
+                  )
+                ),
+          }));
+        };
 
         return (
           <div
             key={memberId}
-            className={`split-checkbox ${isPaidBy ? "paid-by" : ""}`}
+            className={`member-chip-card ${checked ? "selected" : ""} ${
+              isPaidBy ? "paid-by" : ""
+            }`}
           >
+            <label
+              htmlFor={`member-check-${memberId}`}
+              className="member-chip-main"
+            >
+              <input
+                id={`member-check-${memberId}`}
+                type="checkbox"
+                className="chip-checkbox-hidden"
+                checked={checked}
+                onChange={handleToggle}
+              />
 
-            {/* Member selection checkbox */}
-            <input
-              type="checkbox"
-              checked={checked}
-              onChange={(e) => {
+              <div className="chip-avatar-wrapper">
+                {user.avatar ? (
+                  <img
+                    src={user.avatar}
+                    alt={user.name}
+                    className="chip-avatar-img"
+                  />
+                ) : (
+                  <div className="chip-avatar-initial">{initialLetter}</div>
+                )}
+                {checked && (
+                  <div className="chip-checkmark">
+                    <RiCheckLine size={12} />
+                  </div>
+                )}
+              </div>
 
-                const isChecked = e.target.checked;
+              <div className="chip-info">
+                <span className="chip-name">{user.name}</span>
+                {isPaidBy && <span className="paid-by-badge">Paid</span>}
+              </div>
 
-                setFormInput((prev) => ({
-                  ...prev,
-
-                  splitBetween: isChecked
-                    ? [...prev.splitBetween, memberId]
-                    : prev.splitBetween.filter(
-                        (id) => id !== memberId
-                      ),
-
-                  // Remove split amount when unchecked
-                  splits: isChecked
-                    ? prev.splits
-                    : Object.fromEntries(
-                        Object.entries(prev.splits).filter(
-                          ([id]) => id !== memberId
-                        )
-                      ),
-                }));
-              }}
-            />
-
-            {/* Member name + paid badge */}
-            <span className="member-name">
-              {user.name}
-
-              {isPaidBy && (
-                <span className="paid-by-badge">
-                  Paid
-                </span>
+              {checked && formInput.splitType === "EQUAL" && equalAmount && (
+                <span className="chip-equal-amount">₹{equalAmount}</span>
               )}
-            </span>
+            </label>
 
-
-            {/* Amount display / input */}
-            {checked &&
-              (formInput.splitType === "EQUAL" ? (
-                <span className="member-amount">
-                  ₹ {equalAmount}
-                </span>
-              ) : (
+            {checked && formInput.splitType === "EXACT" && (
+              <div className="chip-exact-input-wrap">
+                <span className="exact-currency">₹</span>
                 <input
+                  id={`split-amount-${memberId}`}
                   type="number"
-                  className="split-amount-input"
-                  placeholder="₹"
-                  value={formInput.splits[memberId] || ""}
+                  className="chip-amount-input"
+                  placeholder="0"
+                  value={formInput.splits[memberId] ?? ""}
                   onChange={(e) => {
-
-                    const value = Number(
-                      e.target.value || 0
-                    );
+                    const value = Number(e.target.value || 0);
 
                     setFormInput((prev) => ({
                       ...prev,
@@ -108,7 +109,8 @@ function SplitMembersList({
                     }));
                   }}
                 />
-              ))}
+              </div>
+            )}
           </div>
         );
       })}

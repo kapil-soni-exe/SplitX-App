@@ -1,23 +1,17 @@
+import React from "react";
+
 /**
  * PaidBySelect
  * -----------------
  * Handles selection of the user who paid the expense
- *
- * Note:
- * members now have structure:
- *
- * {
- *   userId: { _id, name, avatar },
- *   joinedAt: Date
- * }
  */
-
 function PaidBySelect({ members = [], paidBy, setFormInput }) {
   return (
     <div className="form-field">
-      <label>Paid By</label>
+      <label htmlFor="expense-paid-by">Paid By</label>
 
       <select
+        id="expense-paid-by"
         className="form-dropdown"
         value={paidBy}
         onChange={(e) =>
@@ -31,8 +25,6 @@ function PaidBySelect({ members = [], paidBy, setFormInput }) {
 
         {members.map((member) => {
           const user = member.userId;
-
-          // safety check in case userId not populated
           if (!user) return null;
 
           return (

@@ -1,11 +1,9 @@
+import React from "react";
+
 /**
  * SplitTypeToggle
  * -----------------
- * Controls the UI toggle between:
- * - Equal split
- * - Unequal split
- *
-
+ * Accessible toggle between Equal and Unequal split modes using <button type="button">
  */
 function SplitTypeToggle({ splitType, setFormInput }) {
   return (
@@ -13,7 +11,8 @@ function SplitTypeToggle({ splitType, setFormInput }) {
       <p>Split Between</p>
 
       <div className="split-type-inline">
-        <span
+        <button
+          type="button"
           className={`split-option ${
             splitType === "EQUAL" ? "active" : ""
           }`}
@@ -25,9 +24,10 @@ function SplitTypeToggle({ splitType, setFormInput }) {
           }
         >
           Equal
-        </span>
+        </button>
 
-        <span
+        <button
+          type="button"
           className={`split-option ${
             splitType === "EXACT" ? "active" : ""
           }`}
@@ -39,7 +39,7 @@ function SplitTypeToggle({ splitType, setFormInput }) {
           }
         >
           Unequal
-        </span>
+        </button>
       </div>
     </div>
   );
