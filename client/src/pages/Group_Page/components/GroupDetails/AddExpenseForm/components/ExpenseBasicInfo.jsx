@@ -1,58 +1,89 @@
-import Input from "../../../../../../components/comman/Input";
+import React, { useState } from "react";
+import { RiAddLine, RiFileTextLine } from "@remixicon/react";
 
 /**
  * ExpenseBasicInfo
  * -----------------
- * Handles only basic expense information UI:
- * - Title
- * - Amount
- * - Description
+ * Hero section for Title & Amount, plus collapsible Description note.
  */
 function ExpenseBasicInfo({ formInput, setFormInput }) {
+  const [showNote, setShowNote] = useState(Boolean(formInput.description));
+
   return (
-    <>
-      {/* Title and Amount inputs */}
-      <div className="form-row">
-        <Input
-          label="Title"
-          value={formInput.title}
-          onChange={(e) =>
-            setFormInput((prev) => ({
-              ...prev,
-              title: e.target.value,
-            }))
-          }
-        />
+    <div className="expense-basic-info">
+      {/* HERO SECTION: Title & Amount */}
+      <div className="expense-hero-card">
+        <div className="hero-title-field">
+          <input
+            id="expense-title"
+            type="text"
+            className="hero-title-input"
+            placeholder="What's this for?"
+            value={formInput.title}
+            onChange={(e) =>
+              setFormInput((prev) => ({
+                ...prev,
+                title: e.target.value,
+              }))
+            }
+          />
+        </div>
 
-        <Input
-          type="number"
-          label="Amount"
-          value={formInput.amount}
-          onChange={(e) =>
-            setFormInput((prev) => ({
-              ...prev,
-              amount: e.target.value,
-            }))
-          }
-        />
+        <div className="hero-amount-field">
+          <span className="currency-symbol">₹</span>
+          <input
+            id="expense-amount"
+            type="number"
+            className="hero-amount-input"
+            placeholder="0"
+            value={formInput.amount}
+            onChange={(e) =>
+              setFormInput((prev) => ({
+                ...prev,
+                amount: e.target.value,
+              }))
+            }
+          />
+        </div>
       </div>
 
-      {/* Optional description textarea */}
-      <div className="form-field">
-        <label>Description (optional)</label>
-        <textarea
-          className="form-textarea"
-          rows={2}
-          value={formInput.description}
-          onChange={(e) =>
-            setFormInput((prev) => ({
-              ...prev,
-              description: e.target.value,
-            }))
-          }
-        />
+      {/* COLLAPSIBLE DESCRIPTION */}
+      <div className="description-collapsible">
+        {!showNote ? (
+          <button
+            type="button"
+            className="add-note-btn"
+            onClick={() => setShowNote(true)}
+          >
+            <RiAddLine size={16} />
+            <span>Add a note</span>
+          </button>
+        ) : (
+          <div className="form-field">
+            <label htmlFor="expense-description">
+              <RiFileTextLine
+                size={14}
+                style={{ verticalAlign: "middle", marginRight: "4px" }}
+              />
+              Note (optional)
+            </label>
+            <textarea
+              id="expense-description"
+              className="form-textarea"
+              rows={2}
+              placeholder="Add details..."
+              value={formInput.description}
+              onChange={(e) =>
+                setFormInput((prev) => ({
+                  ...prev,
+                  description: e.target.value,
+                }))
+              }
+            />
+          </div>
+        )}
       </div>
-    </>
+    </div>
   );
 }
 
