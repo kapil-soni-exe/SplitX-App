@@ -56,24 +56,56 @@ export function useExpenseForm({
     }
   }, [isEdit, initialData?._id]);
 
+  const numericAmount = Number(formInput.amount);
+  const isValidAmount = !Number.isNaN(numericAmount) && numericAmount > 0;
+
   const isSuspiciousAmount =
-    Number(formInput.amount) >= LARGE_AMOUNT_THRESHOLD;
+    isValidAmount && numericAmount >= LARGE_AMOUNT_THRESHOLD;
+
+  // Paid by member must be included in splitBetween (enforced by backend for both EQUAL & EXACT)
+  const isPaidByInSplit = formInput.paidBy
+    ? formInput.splitBetween.includes(formInput.paidBy)
+    : true;
+
+  // Real-time validation for EXACT split total
+  const exactSplitSumValid = (() => {
+    if (formInput.splitType !== "EXACT") return true;
+
+    for (const id of formInput.splitBetween) {
+      if (
+        formInput.splits[id] === undefined ||
+        formInput.splits[id] === ""
+      ) {
+        return false;
+      }
+    }
+    const total = Object.values(formInput.splits).reduce(
+      (sum, v) => sum + Number(v),
+      0
+    );
+    return Number(total.toFixed(2)) === numericAmount;
+  })();
 
   // Disable submit button when invalid
   const isSubmitDisabled =
     !formInput.title.trim() ||
     !formInput.amount ||
+    !isValidAmount ||
     !formInput.paidBy ||
     formInput.splitBetween.length < 2 ||
-    !formInput.createdAt;
+    !formInput.createdAt ||
+    !isPaidByInSplit ||
+    !exactSplitSumValid;
 
   const submitErrorReason = (() => {
     if (!formInput.title.trim()) return "Enter expense title";
-    if (!formInput.amount) return "Enter amount";
+    if (!formInput.amount || !isValidAmount) return "Enter a valid amount";
     if (!formInput.paidBy) return "Select who paid";
     if (formInput.splitBetween.length < 2)
       return "Select at least 2 members";
+    if (!isPaidByInSplit) return "Payer must be included in split";
     if (!formInput.createdAt) return "Select date";
+    if (!exactSplitSumValid) return "Split amounts must add up to total";
     return null;
   })();
 
@@ -81,30 +113,28 @@ export function useExpenseForm({
     e.preventDefault();
 
     if (isSubmitDisabled) {
-      alert("Please select at least 2 members and fill all required fields");
       return;
-    }
-
-    const numericAmount = Number(formInput.amount);
-    if (Number.isNaN(numericAmount) || numericAmount <= 0) {
-      alert("Enter a valid amount");
-      return;
-    }
-
-    // ⚠️ Large amount confirmation
-    if (isSuspiciousAmount) {
-      const confirmed = window.confirm(
-        `Amount ₹${numericAmount} looks unusually high.\n\nPlease double-check.\nDo you want to continue?`
-      );
-      if (!confirmed) return;
     }
 
     /* ===============================
-       EDIT + EQUAL SPLIT (FIXED)
+       EDIT + EQUAL SPLIT (Penny-Rounding Fix)
        =============================== */
     if (isEdit && formInput.splitType === "EQUAL") {
-      const perHead =
-        numericAmount / formInput.splitBetween.length;
+      const memberCount = formInput.splitBetween.length;
+      const baseShare = Math.floor((numericAmount / memberCount) * 100) / 100;
+      const splitsArray = formInput.splitBetween.map((id) => ({
+        userId: id,
+        amount: baseShare,
+      }));
+
+      const currentTotal = splitsArray.reduce((sum, s) => sum + s.amount, 0);
+      const residual = Number((numericAmount - currentTotal).toFixed(2));
+
+      // Residual added to paidBy member
+      const payerSplit = splitsArray.find((s) => s.userId === formInput.paidBy);
+      if (payerSplit) {
+        payerSplit.amount = Number((payerSplit.amount + residual).toFixed(2));
+      }
 
       onAddExpense({
         title: formInput.title.trim(),
@@ -112,10 +142,7 @@ export function useExpenseForm({
         amount: numericAmount,
         paidBy: formInput.paidBy,
         splitType: "EQUAL",
-        splits: formInput.splitBetween.map((id) => ({
-          userId: id,
-          amount: Number(perHead.toFixed(2)),
-        })),
+        splits: splitsArray,
         expenseDate: formInput.createdAt,
       });
 
@@ -126,36 +153,6 @@ export function useExpenseForm({
        EXACT SPLIT (ADD + EDIT)
        =============================== */
     if (formInput.splitType === "EXACT") {
-      const hasAnySplitValue =
-        Object.keys(formInput.splits).length > 0;
-
-      if (hasAnySplitValue) {
-        for (const id of formInput.splitBetween) {
-          if (
-            formInput.splits[id] === undefined ||
-            formInput.splits[id] === ""
-          ) {
-            alert("Enter amount for all selected members");
-            return;
-          }
-        }
-
-        const total = Object.values(formInput.splits).reduce(
-          (sum, v) => sum + Number(v),
-          0
-        );
-
-        if (Number(total.toFixed(2)) !== numericAmount) {
-          alert("Split total must equal expense amount");
-          return;
-        }
-      }
-
-      if (!formInput.splitBetween.includes(formInput.paidBy)) {
-        alert("Paid by user must be included in split");
-        return;
-      }
-
       onAddExpense({
         ...(isEdit ? {} : { groupId }),
         title: formInput.title.trim(),
@@ -195,9 +192,9 @@ export function useExpenseForm({
    * UI-only equal split preview
    */
   const equalAmount =
-    formInput.amount && formInput.splitBetween.length > 0
+    isValidAmount && formInput.splitBetween.length > 0
       ? (
-          Number(formInput.amount) /
+          numericAmount /
           formInput.splitBetween.length
         ).toFixed(2)
       : null;
