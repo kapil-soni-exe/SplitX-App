@@ -1,35 +1,36 @@
-import { useEffect, useState } from "react";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { FetchGroupbyId } from "../../api/group.api";
 
 export function useGroupDetail(groupId) {
-  const [group, setGroup] = useState(null);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
+  const queryClient = useQueryClient();
 
-  useEffect(() => {
-    if (!groupId){
-      setLoading(false)
-      return
-    }
+  const { data, isLoading, isFetching, error, refetch } = useQuery({
+    queryKey: ["group", groupId],
+    queryFn: async () => {
+      const res = await FetchGroupbyId(groupId);
+      return res.data.data;
+    },
+    enabled: !!groupId,
+    // Show previous group data during group switch instead of flashing a blank/spinner
+    placeholderData: (previousData) => previousData,
+  });
 
-    const loadGroup = async () => {
-      try {
-        setLoading(true);
-        setError(null);
-        const res = await FetchGroupbyId(groupId);
-        setGroup(res.data.data);
-      } catch (err) {
-        setError(err);
-      } finally {
-        setLoading(false);
-      }
-    };
+  /**
+   * Locally update the group admin in the React Query cache
+   * when an admin-changed socket event fires (no refetch needed).
+   */
+  const updateAdminLocal = (adminId) => {
+    queryClient.setQueryData(["group", groupId], (prev) =>
+      prev ? { ...prev, admin: adminId } : prev
+    );
+  };
 
-    loadGroup();
-  }, [groupId]);
-
-
-  
-
-  return { group, loading, error, };
+  return {
+    group: data,
+    loading: isLoading,             // true only on first load (no cache), false on group switch
+    isRefetching: isFetching && !isLoading, // background re-fetch indicator
+    error,
+    updateAdminLocal,
+    refetch,
+  };
 }

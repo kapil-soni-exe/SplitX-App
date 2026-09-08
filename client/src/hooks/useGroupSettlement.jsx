@@ -1,39 +1,50 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import {
   fetchGroupSettlements,
   createSettlement,
 } from "../../api/settlement.api";
 
 export function useGroupSettlement(groupId) {
-  const [history, setHistory] = useState([]);
-  const [loading, setLoading] = useState(true);
+  const queryClient = useQueryClient();
   const [creating, setCreating] = useState(false);
 
-  // Fetch settlement history
-  useEffect(() => {
-    async function load() {
-      try {
-        const res = await fetchGroupSettlements(groupId);
-        setHistory(res.data);
-      } catch (err) {
-        console.error("Settlement fetch error", err);
-      } finally {
-        setLoading(false);
-      }
-    }
+  /* =========================
+     Fetch settlement history (React Query)
+     - isLoading aliased to "loading" for backward compat
+     - enabled guard replaces the old "if (groupId) load()" pattern
+  ========================= */
 
-    if (groupId) load();
-  }, [groupId]);
+  const { data: history = [], isLoading: loading } = useQuery({
+    queryKey: ["settlements", groupId],
+    queryFn: async () => {
+      const res = await fetchGroupSettlements(groupId);
+      return res.data; // backend returns array directly on res.data
+    },
+    enabled: !!groupId,
+  });
 
-  // Create settlement
+  /* =========================
+     Create settlement
+     - setQueryData for immediate local update (no refetch needed for history list)
+     - invalidateQueries on ["group", groupId] to sync netBalance / payList /
+       receiveList that ToPay, ToReceive, and GroupSummary depend on
+  ========================= */
+
   const handleCreateSettlement = async (payload) => {
     try {
       setCreating(true);
-
       const res = await createSettlement(groupId, payload);
 
-      // Optimistic update (no refetch)
-      setHistory((prev) => [res.data.settlement, ...prev]);
+      // Add new settlement to top of history cache immediately
+      queryClient.setQueryData(["settlements", groupId], (prev = []) => [
+        res.data.settlement,
+        ...prev,
+      ]);
+
+      // Invalidate group detail so netBalance / payList / receiveList recalculate
+      // (["group", groupId] is the exact key used in useGroupDetail)
+      queryClient.invalidateQueries({ queryKey: ["group", groupId] });
 
       return { success: true };
     } catch (err) {
