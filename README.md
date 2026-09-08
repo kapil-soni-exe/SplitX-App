@@ -18,6 +18,24 @@ Managing shared expenses during group trips, household living, or outings often 
 
 Built with a modern Single Page Application (SPA) architecture on the frontend and an Express/MongoDB backend, SplitX keeps all group members instantly in sync via WebSocket rooms. Whenever a user adds an expense, records a settlement, or joins a group, updates are pushed in real time without requiring page refreshes.
 
+🔗 **Live Demo**: [https://split-x-app-pied.vercel.app](https://split-x-app-pied.vercel.app)
+
+---
+
+## 📍 Table of Contents
+
+- [Overview](#-overview)
+- [Key Features](#-key-features)
+- [Tech Stack](#-tech-stack)
+- [Architecture \& Data Flow](#-architecture--data-flow)
+- [Folder Structure](#-folder-structure)
+- [API \& Socket Events Reference](#-api--socket-events-reference)
+- [Installation \& Local Setup](#-installation--local-setup)
+- [Screenshots \& Demo](#-screenshots--demo)
+- [Future Roadmap](#-future-roadmap)
+- [Contributing](#-contributing)
+- [License](#-license)
+
 ---
 
 ## ✨ Key Features
@@ -26,6 +44,7 @@ Built with a modern Single Page Application (SPA) architecture on the frontend a
 - ⚖️ **Flexible Expense Splitting**:
   - **EQUAL Split**: Automatically divides the expense amount equally among all selected group members.
   - **EXACT Split**: Allows custom precise amount allocation per member with live total validation.
+- 💬 **Interactive Group Activity Feed**: Displays group expenses and settlement transactions in a chronological, chat-style activity stream (`ExpenseChatList`).
 - 💵 **Smart Balance & Settlement System**:
   - Automatically calculates net balances (`payList` and `receiveList`) for every member in a group.
   - Interactive **Settle Modal** allowing members to record direct payments and clear pending dues.
@@ -218,22 +237,13 @@ cd SplitX-App
 ```
 
 ### 2. Backend Setup
-Navigate to the `Backend` folder and install dependencies:
+Navigate to the `Backend` folder, install dependencies, and create `.env` from `.env.example`:
 ```bash
 cd Backend
 npm install
+cp .env.example .env
 ```
-
-Create a `.env` file inside the `Backend` directory:
-```env
-PORT=3000
-MONGO_URL=your_mongodb_connection_string
-JWT_SECRET=your_jwt_secret_key
-JWT_REFRESH_SECRET=your_jwt_refresh_secret_key
-RESEND_API=your_resend_api_key
-EMAIL_FROM=onboarding@resend.dev
-CLIENT_ORIGIN=http://localhost:5173,https://split-x-app-pied.vercel.app
-```
+*(Fill in your MongoDB URI, JWT secrets, and API keys inside `.env`)*
 
 Start the Backend development server:
 ```bash
@@ -241,17 +251,13 @@ npm run dev
 ```
 
 ### 3. Frontend Setup
-In a new terminal, navigate to the `client` directory:
+In a new terminal, navigate to the `client` directory, install dependencies, and create `.env` from `.env.example`:
 ```bash
 cd client
 npm install
+cp .env.example .env
 ```
-
-Create a `.env` file inside the `client` directory:
-```env
-VITE_API_URL=http://localhost:3000/api
-VITE_FIREBASE_VAPID_KEY=your_firebase_vapid_key
-```
+*(Update `VITE_API_URL` and `VITE_FIREBASE_VAPID_KEY` inside `.env` if needed)*
 
 Start the Frontend development server:
 ```bash
@@ -264,15 +270,20 @@ The application will be running locally at `http://localhost:5173`.
 
 ## 📸 Screenshots & Demo
 
-> [TODO: Add application screenshots here]
+*Screenshots coming soon.*
 
-| Dashboard View | Group Expense Chat |
+<details>
+<summary>🎥 Click to expand demo preview / GIF structure</summary>
+
+| Dashboard Overview | Group Expenses & Settlement Feed |
 | :---: | :---: |
-| ![Dashboard Placeholder](https://via.placeholder.com/600x350?text=Dashboard+Overview) | ![Group View Placeholder](https://via.placeholder.com/600x350?text=Group+Expenses+%26+Settlement) |
+| <!-- Add Dashboard screenshot/GIF here --> | <!-- Add Group View screenshot/GIF here --> |
 
 | Settle Up Modal | Add Expense Modal |
 | :---: | :---: |
-| ![Settle Modal Placeholder](https://via.placeholder.com/600x350?text=Settle+Up+Modal) | ![Add Expense Placeholder](https://via.placeholder.com/600x350?text=Add+Expense+Modal) |
+| <!-- Add Settle Modal screenshot/GIF here --> | <!-- Add Add Expense Modal screenshot/GIF here --> |
+
+</details>
 
 ---
 
@@ -299,4 +310,12 @@ Contributions are welcome! Follow these steps to contribute:
 
 ## 📝 License
 
-[TODO: Specify license type, e.g., MIT License]
+Distributed under the MIT License. See `LICENSE` for more information.
+
+Copyright (c) 2025 Kapil Soni.
+
+Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom it is furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
