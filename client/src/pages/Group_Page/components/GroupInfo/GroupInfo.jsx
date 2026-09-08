@@ -9,37 +9,41 @@ import ConfirmModal from "../../../../components/comman/ConfirmModel";
 import { useState } from "react";
 import Spinner from "../../../../components/Loaders/Spinner";
 
-function GroupInfo({ groupId, onBack,onGroupLeft,onCloseChat  }) {
+function GroupInfo({ groupId, onBack, onGroupLeft, onCloseChat }) {
   const [showLeaveModal, setShowLeaveModal] = useState(false);
+  const [error, setError] = useState(null);
   const { group, loading } = useGroupDetail(groupId);
-
 
   /**
    * Check if member is admin
    * Now member object contains userId
    */
-const isAdmin = (memberId) => {
-  if (!group) return false;
-  const adminId = group.admin?._id || group.admin;
-  return memberId?.toString() === adminId?.toString();
-};
+  const isAdmin = (memberId) => {
+    if (!group) return false;
+    const adminId = group.admin?._id || group.admin;
+    return memberId?.toString() === adminId?.toString();
+  };
 
- const handleExitGroup = async () => {
-  try {
-    await leaveGroup(groupId);
-    onGroupLeft(); 
-    onCloseChat(); 
-    onBack(); 
-    setShowLeaveModal(false);
-    
-
-  } catch (err) {
-    console.error("Leave group failed", err);
-  }
-};
+  const handleExitGroup = async () => {
+    setError(null);
+    try {
+      await leaveGroup(groupId);
+      setShowLeaveModal(false);
+      await onGroupLeft();  // wait for cache invalidation before closing panels
+      onCloseChat();
+      onBack();
+    } catch (err) {
+      console.error("Leave group failed", err);
+      const message =
+        err.response?.data?.message ||
+        err.message ||
+        "Failed to leave group. Please settle all balances first.";
+      setError(message);
+    }
+  };
 
   if (loading) {
-    return <Spinner/>
+    return <Spinner />;
   }
 
   if (!group) {
@@ -65,6 +69,7 @@ const isAdmin = (memberId) => {
 
         <InviteSuccess
           inviteLink={`${window.location.origin}/invite/${group.inviteCode}`}
+          subtitle={null}
         />
       </div>
 
@@ -80,19 +85,13 @@ const isAdmin = (memberId) => {
 
             return (
               <div key={user._id} className="group-info-member">
-                <div className="member-avatar">
-                  {user.name?.[0]}
-                </div>
+                <div className="member-avatar">{user.name?.[0]}</div>
 
                 <div className="member-info">
-                  <span className="member-name">
-                    {user.name}
-                  </span>
+                  <span className="member-name">{user.name}</span>
 
                   {isAdmin(user._id) && (
-                    <span className="admin-badge">
-                      Admin
-                    </span>
+                    <span className="admin-badge">Admin</span>
                   )}
                 </div>
               </div>
@@ -104,20 +103,30 @@ const isAdmin = (memberId) => {
       {/* ACTIONS */}
       <div className="group-info-actions">
         <button className="mute-btn">Mute notifications</button>
-        <button className="exit-btn" onClick={()=>setShowLeaveModal(true)}>Exit group</button>
+        <button
+          className="exit-btn"
+          onClick={() => {
+            setError(null);
+            setShowLeaveModal(true);
+          }}
+        >
+          Exit group
+        </button>
       </div>
       <ConfirmModal
-  isOpen={showLeaveModal}
-  title="Leave Group"
-  description="Are you sure you want to leave this group?"
-  confirmText="Leave"
-  cancelText="Cancel"
-  confirmVariant="danger"
-  onConfirm={handleExitGroup}
-  onCancel={() => setShowLeaveModal(false)}
-/>
+        isOpen={showLeaveModal}
+        title="Leave Group"
+        description={error || "Are you sure you want to leave this group?"}
+        confirmText="Leave"
+        cancelText="Cancel"
+        confirmVariant="danger"
+        onConfirm={handleExitGroup}
+        onCancel={() => {
+          setShowLeaveModal(false);
+          setError(null);
+        }}
+      />
     </div>
-    
   );
 }
 

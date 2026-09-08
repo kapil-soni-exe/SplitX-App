@@ -133,6 +133,18 @@ export function useGroupExpenses(groupId, onExpenseCreated) {
         createdAt,
       },
     ]);
+
+    // Also update member count in the groups list sidebar
+    queryClient.setQueryData(["groups"], (prev = []) =>
+      prev.map((g) => {
+        if (g._id?.toString() !== groupId?.toString()) return g;
+        const alreadyIn = g.members?.some(
+          (m) => (m.userId?._id || m.userId)?.toString() === user._id?.toString()
+        );
+        if (alreadyIn) return g;
+        return { ...g, members: [...(g.members || []), { userId: user }] };
+      })
+    );
   };
 
   const addLeaveActivityLocal = ({ user, createdAt }) => {
@@ -145,6 +157,19 @@ export function useGroupExpenses(groupId, onExpenseCreated) {
         createdAt,
       },
     ]);
+
+    // Also remove member from groups list sidebar for instant count update
+    queryClient.setQueryData(["groups"], (prev = []) =>
+      prev.map((g) => {
+        if (g._id?.toString() !== groupId?.toString()) return g;
+        return {
+          ...g,
+          members: (g.members || []).filter(
+            (m) => (m.userId?._id || m.userId)?.toString() !== user._id?.toString()
+          ),
+        };
+      })
+    );
   };
 
   /* =========================

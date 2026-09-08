@@ -7,11 +7,22 @@ import { RiCheckDoubleLine, RiArrowRightSLine } from "@remixicon/react";
 
 function ToReceive({ receiveList = [], onConfirmCollection }) {
   const [isOpen, setIsOpen] = useState(false);
+  const [selectedPersonList, setSelectedPersonList] = useState([]);
 
   const total = receiveList.reduce(
     (sum, item) => sum + item.amount,
     0
   );
+
+  const handleOpenAll = () => {
+    setSelectedPersonList(receiveList);
+    setIsOpen(true);
+  };
+
+  const handleOpenRow = (person) => {
+    setSelectedPersonList([person]);
+    setIsOpen(true);
+  };
 
   return (
     <>
@@ -23,19 +34,31 @@ function ToReceive({ receiveList = [], onConfirmCollection }) {
 
         <div className="receive-body">
           {receiveList.length === 0 ? (
-            <EmptyState
-              title="Nothing to collect"
-              description="No one owes you in this group right now. Time to start a new expense?"
-              icon={<RiCheckDoubleLine size={80} />}
-            />
+            <div className="receive-empty-wrapper">
+              <EmptyState
+                title="Nothing to collect"
+                description="No one owes you in this group right now. Time to start a new expense?"
+                icon={<RiCheckDoubleLine size={80} />}
+              />
+            </div>
           ) : (
             receiveList.map((person) => (
               <div
                 key={person.userId}
                 className="receive-row"
+                tabIndex={0}
+                role="button"
+                aria-label={`Collect ₹${person.amount} from ${person.name}`}
+                onClick={() => handleOpenRow(person)}
+                onKeyDown={(e) => {
+                  if (e.key === "Enter" || e.key === " ") {
+                    e.preventDefault();
+                    handleOpenRow(person);
+                  }
+                }}
               >
                 <div className="receive-left">
-                  <div className="receive-avatar">
+                  <div className="receive-avatar" aria-hidden="true">
                     {person.name?.[0]}
                   </div>
                   <span className="receive-name">
@@ -63,7 +86,7 @@ function ToReceive({ receiveList = [], onConfirmCollection }) {
 
             <button
               className="receive-btn"
-              onClick={() => setIsOpen(true)}
+              onClick={handleOpenAll}
             >
               Collect
             </button>
@@ -71,13 +94,13 @@ function ToReceive({ receiveList = [], onConfirmCollection }) {
         )}
       </div>
 
-      {/* Modal */}
+      {/* Settlement Modal */}
       <Model
         isOpen={isOpen}
         onClose={() => setIsOpen(false)}
       >
         <SettlementSelector
-          list={receiveList}
+          list={selectedPersonList}
           mode="collect"
           onConfirm={(selectedUsers) => {
             onConfirmCollection(selectedUsers);

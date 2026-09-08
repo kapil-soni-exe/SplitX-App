@@ -9,7 +9,7 @@ import { useGroupManager } from "../../hooks/useGroupManager";
 import Spinner from "../../components/Loaders/Spinner";
 
 function Group() {
-  const { groups, selectedGroupId, selectGroup, addGroup, fetchGroups,handleGroupLeft } =
+  const { groups, selectedGroupId, selectGroup, addGroup, fetchGroups, handleGroupLeft, isLoading } =
     useGroupManager();
 
   const [showChatMobile, setShowChatMobile] = useState(false);
@@ -74,8 +74,14 @@ function Group() {
             onExpenseCreated={fetchGroups}
             openExpenseId={pendingExpenseId}
           />
+        ) : isLoading ? (
+          <Spinner />
         ) : (
-          <Spinner/>
+          <div className="groups-empty-state">
+            <div className="groups-empty-icon">💬</div>
+            <h3>No groups yet</h3>
+            <p>Create a group or join one using an invite link</p>
+          </div>
         )}
 
         {/* INFO PANEL (Positioned inside .groups-right) */}

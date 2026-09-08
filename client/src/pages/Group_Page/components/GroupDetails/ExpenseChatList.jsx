@@ -8,16 +8,7 @@
  * - EXPENSE
  * - DELETE
  * - JOIN (system event)
- *
- * Responsibilities:
- * - Sort events by date
- * - Group events by day label
- * - Render incoming / outgoing messages
- * - Render system pills (join etc.)
- *
- * NOTE:
- * - No API calls
- * - No local state
+ * - LEAVE (system event)
  */
 
 import React from "react";
@@ -30,7 +21,6 @@ import {
 import { activityFormatter } from "../../utils/activityFormatter";
 
 function ExpenseChatList({ expenses, user, onSelectExpense }) {
-
   // Sort all timeline events (expenses + joins)
   const sortedExpenses = sortByDate(expenses);
 
@@ -41,9 +31,7 @@ function ExpenseChatList({ expenses, user, onSelectExpense }) {
 
   return (
     <>
-
       {sortedExpenses.map((expense) => {
-
         const label = getDayLabel(expense.createdAt);
 
         // Show date separator when day changes
@@ -57,7 +45,6 @@ function ExpenseChatList({ expenses, user, onSelectExpense }) {
         if (expense.type === "JOIN") {
           return (
             <React.Fragment key={expense._id}>
-
               {showLabel && (
                 <div className="chat-date-separator">
                   {label}
@@ -67,32 +54,29 @@ function ExpenseChatList({ expenses, user, onSelectExpense }) {
               <div className="chat-system-pill">
                 {expense.user.name} joined the group
               </div>
-
             </React.Fragment>
           );
         }
 
         /* =========================
-   LEAVE EVENT (SYSTEM PILL)
-========================= */
+           LEAVE EVENT (SYSTEM PILL)
+        ========================== */
 
-if (expense.type === "LEAVE") {
-  return (
-    <React.Fragment key={expense._id}>
+        if (expense.type === "LEAVE") {
+          return (
+            <React.Fragment key={expense._id}>
+              {showLabel && (
+                <div className="chat-date-separator">
+                  {label}
+                </div>
+              )}
 
-      {showLabel && (
-        <div className="chat-date-separator">
-          {label}
-        </div>
-      )}
-
-      <div className="chat-system-pill">
-        {expense.user.name} left the group
-      </div>
-
-    </React.Fragment>
-  );
-}
+              <div className="chat-system-pill">
+                {expense.user.name} left the group
+              </div>
+            </React.Fragment>
+          );
+        }
 
         /* =========================
            NORMAL EXPENSE EVENTS
@@ -111,7 +95,6 @@ if (expense.type === "LEAVE") {
 
         return (
           <React.Fragment key={expense._id}>
-
             {showLabel && (
               <div className="chat-date-separator">
                 {label}
@@ -127,7 +110,7 @@ if (expense.type === "LEAVE") {
                 }`}
               >
                 <p className="deleted-text">
-                  {expense.deletedBy?._id === user?.id
+                  {expense.deletedBy?._id?.toString() === userId?.toString()
                     ? "You deleted an expense"
                     : `${expense.deletedBy?.name} deleted an expense`}
                 </p>
@@ -144,9 +127,17 @@ if (expense.type === "LEAVE") {
                 className={`chat-message ${
                   isOutgoing ? "outgoing" : "incoming"
                 }`}
+                tabIndex={0}
+                role="button"
+                aria-label={`Expense: ${expense.title || "Detail"}, Amount: ₹${expense.amount || 0}`}
                 onClick={() => onSelectExpense(expense)}
+                onKeyDown={(e) => {
+                  if (e.key === "Enter" || e.key === " ") {
+                    e.preventDefault();
+                    onSelectExpense(expense);
+                  }
+                }}
               >
-
                 {/* Main activity message */}
                 <p>
                   {activityFormatter(expense, userId)}
@@ -179,10 +170,8 @@ if (expense.type === "LEAVE") {
                     </span>
                   )}
                 </span>
-
               </div>
             )}
-
           </React.Fragment>
         );
       })}

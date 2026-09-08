@@ -30,6 +30,7 @@ function GroupSummary({
             className="gs-dropdown"
             value={selectedGroupId}
             onChange={(e) => onGroupChange(e.target.value)}
+            aria-label="Select group"
           >
             {groups.map((group) => (
               <option key={group._id} value={group._id}>
@@ -74,7 +75,11 @@ function GroupSummary({
               netBalance > 0 ? "positive" : netBalance < 0 ? "negative" : ""
             }`}
           >
-            {netBalance === 0 ? "All Settled 🎉" : `₹${netBalance}`}
+            {netBalance === 0
+              ? "All settled"
+              : netBalance > 0
+                ? `You're owed ₹${netBalance}`
+                : `You owe ₹${Math.abs(netBalance)}`}
           </div>
         </div>
       </div>

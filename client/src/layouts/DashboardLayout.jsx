@@ -40,8 +40,8 @@ useEffect(() => {
     localStorage.setItem("theme",newTheme)
   }
 
-  useEffect(()=>{
-    document.documentElement.setAttribute("data-theme",theme)
+  useEffect(() => {
+    document.documentElement.setAttribute("data-theme", theme);
     
     // Dynamically update the theme-color meta tag for PWA
     let metaThemeColor = document.querySelector("meta[name=theme-color]");
@@ -50,9 +50,10 @@ useEffect(() => {
       metaThemeColor.name = "theme-color";
       document.head.appendChild(metaThemeColor);
     }
-    metaThemeColor.content = theme === "dark" ? "#111113" : "#EDF0F8";
+    const bgColor = getComputedStyle(document.documentElement).getPropertyValue('--bg-main').trim();
+    metaThemeColor.content = bgColor;
 
-  }, [theme])
+  }, [theme]);
   return (
     <div className="dashboard-layout">
         <Sidebar />

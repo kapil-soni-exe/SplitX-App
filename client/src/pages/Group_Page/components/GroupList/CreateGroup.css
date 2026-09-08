@@ -1,12 +1,58 @@
-.group-form{
-    display: flex;
-    flex-direction: column;
-    gap: 15px;
-    
+/* ===============================
+   CREATE GROUP FORM
+================================ */
+
+.group-form {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-md, 14px);
+  padding: 4px 0;
 }
 
-.group-form h3{
-    text-align: center;
-    color: var(--accent);
-    font-size: 1rem;
+/* Header Section */
+.create-group-header {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  gap: 4px;
+}
+
+.create-group-icon-circle {
+  width: 52px;
+  height: 52px;
+  border-radius: 50%;
+  background: var(--receive-bg, rgba(67, 56, 202, 0.08));
+  color: var(--accent);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 4px;
+}
+
+.create-group-title {
+  margin: 0;
+  color: var(--text-primary);
+  font-size: 1.1rem;
+  font-weight: 700;
+}
+
+.create-group-subtitle {
+  margin: 0;
+  color: var(--text-muted);
+  font-size: 0.8rem;
+  font-weight: 400;
+}
+
+/* Helper Text */
+.create-group-helper {
+  margin: -4px 0 2px 0;
+  color: var(--text-muted);
+  font-size: 0.75rem;
+  text-align: center;
+}
+
+/* Full Width Submit Button */
+.create-group-submit-btn {
+  width: 100%;
 }

@@ -1,9 +1,10 @@
 .group-summary {
   display: flex;
   flex-direction: column;
-  gap: 0.5rem;
+  gap: var(--space-xs);
   height: 100%;
 }
+
 .gs-header {
   display: flex;
   align-items: center;
@@ -12,15 +13,18 @@
 
 .gs-title {
   font-size: 1.2rem;
-  font-weight: 600;
+  font-weight: 700;
   color: var(--text-primary);
+  letter-spacing: -0.02em;
 }
+
 .gs-subtitle {
   font-size: 0.8rem;
   font-weight: 500;
-  margin-top: 5px;
+  margin-top: 2px;
   color: var(--text-secondary);
 }
+
 .gs-dropdown-wrapper {
   position: relative;
   display: inline-flex;
@@ -28,19 +32,16 @@
 }
 
 .gs-dropdown {
-  appearance: none;          /* 🔥 native arrow hide */
+  appearance: none;
   -webkit-appearance: none;
   -moz-appearance: none;
-
   background-color: transparent;
-  padding: 0.4rem 2rem 0.4rem 0.8rem; /* right space for icon */
-  border-radius: 999px;
+  padding: var(--space-xs) 2rem var(--space-xs) var(--space-sm);
+  border-radius: var(--radius-full);
   border: 1px solid var(--border);
-
   color: var(--text-primary);
   font-size: 0.85rem;
   cursor: pointer;
-
   display: inline-flex;
   align-items: center;
 }
@@ -52,7 +53,6 @@
   font-size: 0.9rem;
 }
 
-/* Arrow icon */
 .gs-dropdown-icon {
   position: absolute;
   right: 0.6rem;
@@ -62,10 +62,9 @@
 
 .gs-main {
   display: grid;
-  grid-template-columns: repeat(2, 1fr);
-
+  grid-template-columns: auto 1fr;
   align-items: center;
-  gap: 0.5rem;
+  gap: var(--space-sm);
 }
 
 .ring-wrap {
@@ -75,8 +74,6 @@
   margin: auto;
 }
 
-
-
 .gs-ring-center {
   position: absolute;
   inset: 0;
@@ -84,42 +81,59 @@
   flex-direction: column;
   align-items: center;
   justify-content: center;
-   pointer-events: none;
+  pointer-events: none;
 }
+
 .ring-label {
   font-size: 0.7rem;
   letter-spacing: 1px;
   color: var(--text-muted);
 }
+
 .ring-value {
   font-size: 1.2rem;
   font-weight: 700;
   color: var(--text-primary);
+  font-variant-numeric: tabular-nums;
 }
 
 .gs-stats {
   display: flex;
   flex-direction: column;
-  gap: 0.6rem;
+  gap: var(--space-xs);
 }
 
 .gs-stat span {
   font-size: 0.8rem;
   color: var(--text-muted);
 }
+
 .gs-stat strong {
   font-size: 1rem;
   color: var(--text-primary);
   margin-left: 0.5rem;
+  font-variant-numeric: tabular-nums;
 }
+
 .gs-stat.highlight {
-  font-weight: 600;
+  font-weight: 700;
+  display: inline-block;
+  width: fit-content;
+  font-variant-numeric: tabular-nums;
 }
+
 .gs-stat.positive {
-  color: #22c55e;
+  color: var(--receive);
+  background: var(--receive-bg);
+  padding: var(--space-xs) var(--space-sm);
+  border-radius: var(--radius-sm);
 }
+
 .gs-stat.negative {
-  color: #ef4444;
+  color: var(--owe);
+  background: var(--owe-bg);
+  padding: var(--space-xs) var(--space-sm);
+  border-radius: var(--radius-sm);
 }
 
 .gs-footer {
@@ -127,7 +141,7 @@
   justify-content: space-between;
   font-size: 0.75rem;
   color: var(--text-muted);
-  padding-top: 0.8rem;
+  padding-top: var(--space-xs);
   border-top: 1px solid var(--border);
+  margin-top: auto;
 }
-

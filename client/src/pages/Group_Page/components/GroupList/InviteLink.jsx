@@ -26,7 +26,7 @@ function InviteSuccess({
   return (
     <div className="invite-success">
       <h3>{title}</h3>
-      <p>{subtitle}</p>
+      {subtitle && <p>{subtitle}</p>}
 
       <Button onClick={handleShare}>
         <RiShareLine size={18} />

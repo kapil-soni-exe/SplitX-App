@@ -12,99 +12,187 @@
 .invite-card {
   width: 100%;
   max-width: 420px;
-  background: var(--bg-card);
-  border-radius: 12px;
-  padding: 24px 20px;
-
+  background-color: var(--bg-card);
+  background-image: var(--card-gradient, linear-gradient(135deg, var(--bg-card), var(--bg-main)));
+  border-radius: 16px;
+  padding: 28px 24px;
   border: 1px solid var(--border);
-
+  box-shadow: var(--shadow-lg, 0 10px 30px rgba(0, 0, 0, 0.15));
   text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  animation: fadeIn 0.25s ease;
 }
 
-/* ===== App Icon / Placeholder ===== */
-.invite-icon {
-  width: 64px;
-  height: 64px;
-  border-radius: 50%;
-  background: var(--interactive-bg);
-  color: var(--button-text);
+/* ===== Invited Pill Badge ===== */
+.invite-pill-badge {
+  display: inline-block;
+  padding: 4px 12px;
+  border-radius: 999px;
+  background: var(--receive-bg, rgba(67, 56, 202, 0.1));
+  color: var(--accent);
+  font-size: 0.7rem;
+  font-weight: 700;
+  letter-spacing: 0.6px;
+  text-transform: uppercase;
+  margin-bottom: 16px;
+}
 
+/* ===== App Icon / Group Avatar ===== */
+.invite-avatar {
+  width: 80px;
+  height: 80px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, var(--accent), var(--active-btn, #4f46e5));
+  color: var(--button-text, #ffffff);
   display: flex;
   align-items: center;
   justify-content: center;
-
-  font-size: 28px;
+  font-size: 36px;
   font-weight: 700;
-  margin: 0 auto 16px;
-}
-
-/* ===== Title ===== */
-.invite-title {
-  font-size: 16px;
-  font-weight: 600;
-  color: var(--text-primary);
-  margin-bottom: 8px;
+  margin: 0 auto 14px;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.12);
 }
 
 /* ===== Subtitle ===== */
 .invite-subtitle {
   font-size: 14px;
   color: var(--text-muted);
-  margin-bottom: 20px;
+  margin: 0 0 6px 0;
 }
 
-/* ===== Group Info ===== */
+/* ===== Group Name ===== */
 .invite-group-name {
-  font-size: 18px;
+  font-size: 24px;
   font-weight: 700;
-  color: var(--text-secondary);
-  margin-bottom: 4px;
+  color: var(--text-primary);
+  margin: 0 0 18px 0;
+  word-break: break-word;
 }
 
-.invite-members {
-  font-size: 13px;
-  color: var(--text-muted);
+/* ===== Member Avatar Stack ===== */
+.invite-members-section {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
   margin-bottom: 24px;
 }
 
-/* ===== Join Button ===== */
+.member-avatar-stack {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.stack-avatar {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: var(--bg-card);
+  border: 2px solid var(--bg-card);
+  color: var(--text-primary);
+  font-size: 12px;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-left: -8px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.stack-avatar:first-child {
+  margin-left: 0;
+}
+
+.stack-more {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: var(--accent);
+  border: 2px solid var(--bg-card);
+  color: var(--button-text, #ffffff);
+  font-size: 10px;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-left: -8px;
+}
+
+.invite-members-text {
+  font-size: 13px;
+  color: var(--text-muted);
+  margin: 0;
+}
+
+/* ===== Join Button Fix ===== */
 .invite-join-btn {
   width: 100%;
   padding: 12px;
-  border-radius: 8px;
+  border-radius: 10px;
   border: none;
-
   background: var(--accent);
-  color: var(--button-text);
-
+  color: var(--button-text, #ffffff);
   font-size: 15px;
   font-weight: 600;
-
-  cursor: not-allowed;
-  opacity: 0.6;
-}
-
-/* ===== Enabled (future) ===== */
-.invite-join-btn.active {
-  opacity: 1;
   cursor: pointer;
+  opacity: 1;
+  transition: opacity 0.2s ease, background-color 0.2s ease;
 }
 
-.invite-join-btn.active:hover {
+.invite-join-btn:hover {
   background: var(--active-btn);
 }
 
-/* ===== Loading / Error ===== */
-.invite-status,
-.invite-error {
-  min-height: 100vh;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  font-size: 14px;
-  color: var(--text-muted);
+.invite-join-btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
 }
 
-.invite-error {
-  color: #ff6b6b;
+/* ===== Error Messages ===== */
+.invite-join-error {
+  color: var(--owe);
+  font-size: 13px;
+  margin-bottom: 12px;
+}
+
+/* Loading Card */
+.invite-loading-card {
+  gap: 16px;
+  padding: 40px 24px;
+}
+
+.invite-status-text {
+  font-size: 14px;
+  color: var(--text-muted);
+  margin: 0;
+}
+
+/* Error Card */
+.invite-error-card {
+  gap: 12px;
+}
+
+.invite-error-icon {
+  color: var(--owe);
+  margin-bottom: 4px;
+}
+
+.invite-error-title {
+  font-size: 18px;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin: 0;
+}
+
+.invite-error-text {
+  font-size: 14px;
+  color: var(--owe);
+  margin: 0 0 12px 0;
+}
+
+.invite-back-btn {
+  width: 100%;
 }

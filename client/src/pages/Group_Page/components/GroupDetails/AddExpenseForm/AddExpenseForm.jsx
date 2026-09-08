@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React from "react";
 import "./AddExpenseForm.css";
 import Button from "../../../../../components/comman/Button";
 import { RiErrorWarningLine } from "@remixicon/react";
@@ -10,14 +10,11 @@ import PaidBySelect from "./components/PaidBySelect";
 import SplitTypeToggle from "./components/SplitTypeToggle";
 import SplitMembersList from "./components/SplitMembersList";
 import ExpenseDate from "./components/ExpenseDate";
-import ScanReceiptButton from "./components/ScanReceiptButton";
-import DuplicateWarningBanner from "./components/DuplicateWarningBanner";
 
 /**
  * AddExpenseForm
  * -----------------
  * All form logic is handled inside useExpenseForm hook.
- * Receipt scan flow: ScanReceiptButton → prefill formInput → show DuplicateWarningBanner if needed.
  */
 function AddExpenseForm({
   members = [],
@@ -36,80 +33,9 @@ function AddExpenseForm({
     isSuspiciousAmount,
   } = useExpenseForm({ groupId, onAddExpense, initialData, isEdit });
 
-  // Receipt scan state
-  const [duplicateWarning, setDuplicateWarning] = useState(null);
-  const [scanError, setScanError] = useState(null);
-  const [lowConfidenceWarning, setLowConfidenceWarning] = useState(false);
-
-  /* ── Scan handlers ─────────────────────────────────────────────────────── */
-  const handleScanComplete = (data) => {
-    // Pre-fill form fields from extracted receipt data
-    setFormInput((prev) => ({
-      ...prev,
-      title: data.title ?? prev.title,
-      amount: data.amount != null ? String(data.amount) : prev.amount,
-      createdAt: data.date ?? prev.createdAt,
-    }));
-
-    // Clear any previous scan error
-    setScanError(null);
-
-    // Set duplicate warning if backend found similar expenses
-    if (data.duplicateWarning?.matches?.length) {
-      setDuplicateWarning(data.duplicateWarning.matches);
-    } else {
-      setDuplicateWarning(null);
-    }
-
-    // Warn user if AI confidence was low
-    setLowConfidenceWarning(data.confidence === "low");
-  };
-
-  const handleScanError = (message) => {
-    setScanError(message);
-    setDuplicateWarning(null);
-    setLowConfidenceWarning(false);
-  };
-
   return (
     <form className="add-expense-form" onSubmit={handleSubmit}>
       <h3 className="form-title">{isEdit ? "Edit Expense" : "Add Expense"}</h3>
-
-      {/* ── Receipt Scan Section (only for new expenses) ─────────────────── */}
-      {!isEdit && !initialData && (
-        <div className="scan-receipt-section">
-          <ScanReceiptButton
-            groupId={groupId}
-            onScanComplete={handleScanComplete}
-            onScanError={handleScanError}
-          />
-          {/* Scan error inline */}
-          {scanError && (
-            <div className="form-alert error-alert">
-              <RiErrorWarningLine size={16} />
-              <span>{scanError}</span>
-            </div>
-          )}
-
-          {/* Low confidence nudge */}
-          {lowConfidenceWarning && (
-            <div className="form-alert warning-alert">
-              <RiErrorWarningLine size={16} />
-              <span>Image was unclear — please verify the extracted details.</span>
-            </div>
-          )}
-
-          {/* Duplicate warning banner */}
-          {duplicateWarning && (
-            <DuplicateWarningBanner
-              matches={duplicateWarning}
-              onDismiss={() => setDuplicateWarning(null)}
-            />
-          )}
-
-          <div className="scan-divider">OR</div>
-        </div>
-      )}
 
       {/* Hero Section: Title & Amount + Collapsible Note */}
       <ExpenseBasicInfo formInput={formInput} setFormInput={setFormInput} />

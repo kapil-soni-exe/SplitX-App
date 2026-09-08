@@ -90,7 +90,7 @@ function Dashboard() {
         />
       </div>
 
-      <div className="cards col-3">
+      <div className="cards cards-topay col-3">
         <ToPay
           payList={payList}
           netBalance={netBalance}
@@ -98,7 +98,7 @@ function Dashboard() {
         />
       </div>
 
-      <div className="cards col-3">
+      <div className="cards cards-toreceive col-3">
         <ToReceive
           receiveList={receiveList}
           netBalance={netBalance}
@@ -106,15 +106,11 @@ function Dashboard() {
         />
       </div>
 
-    
-
-      <div className="cards col-12">
+      <div className="cards cards-list col-12">
         <RecentActivity groups={groups} />
       </div>
 
-      
-
-      <div className="cards col-12">
+      <div className="cards cards-list col-12">
         <InsightsCard />
       </div>
     </div>

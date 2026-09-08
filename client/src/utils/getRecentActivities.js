@@ -3,11 +3,13 @@ export function getRecentActivities(groups = []) {
     .filter(g => g.lastExpense)
     .map(g => ({
       id: g.lastExpense.expenseId,
+      expenseId: g.lastExpense.expenseId,   // explicit — navigate state ke liye
+      groupId: g._id,                        // navigate state ke liye
       name: g.lastExpense.createdBy?.name || "Someone",
       title: g.lastExpense.title,
       groupName: g.name,
       amount: g.lastExpense.amount,
-      createdAt: g.lastExpense.createdAt
+      createdAt: g.lastExpense.createdAt,
     }))
     .sort((a,b)=> new Date(b.createdAt) - new Date(a.createdAt))
     .slice(0,10);

@@ -56,27 +56,35 @@ function GroupList({
       setLoading(true);
 
       // call hook to create group
-      const { group, inviteLink } = await create(name);
+      const res = await create(name);
 
-      // save group + invite link
-      setCreatedGroup(group);
-      setInviteLink(inviteLink);
+      if (res.success) {
+        // save group + invite link
+        setCreatedGroup(res.group);
+        setInviteLink(res.inviteLink);
 
-      // update parent state
-      onGroupCreated(group._id);
+        // update parent state
+        onGroupCreated(res.group._id);
 
-      // auto select created group
-      onSelectGroup(group._id);
+        // auto select created group
+        onSelectGroup(res.group._id);
 
-      // copy invite link automatically
-      await navigator.clipboard.writeText(inviteLink);
+        // copy invite link automatically
+        if (res.inviteLink) {
+          try {
+            await navigator.clipboard.writeText(res.inviteLink);
+          } catch (clipErr) {
+            console.error("Clipboard copy error:", clipErr);
+          }
+        }
 
-      // success toast
-      showSuccessToast("Group created 🎉 Invite link copied");
-
+        // success toast
+        showSuccessToast("Group created 🎉 Invite link copied");
+      } else {
+        showErrorToast(res.message || "Failed to create group");
+      }
     } catch (err) {
-      // show error toast
-      showErrorToast(err);
+      console.error("Create group error:", err);
     } finally {
       setLoading(false);
     }

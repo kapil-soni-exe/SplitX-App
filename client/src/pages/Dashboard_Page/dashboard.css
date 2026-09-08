@@ -1,47 +1,96 @@
-.dashboard-grid{
-    display: grid;
-    grid-template-columns: repeat(12,1fr);
-    gap: 1.2rem;
-    height: 100%;
-    padding: 1rem;
+/* ==========================================================================
+   SplitX Dashboard Grid & Card Token Styling
+   ========================================================================== */
+
+.dashboard-grid {
+  display: grid;
+  grid-template-columns: repeat(12, 1fr);
+  gap: var(--space-md);
+  height: 100%;
+  padding: var(--space-md);
+  font-variant-numeric: tabular-nums;
 }
 
+/* Grid Column Spans */
 .col-6 { grid-column: span 6; }
-.col-3{grid-column: span 3;}
-.col-12{grid-column: span 12;}
+.col-3 { grid-column: span 3; }
+.col-12 { grid-column: span 12; }
 
-.cards{
+/* Base Card Styling (Strictly Token-Driven) */
+.cards {
+  background-color: var(--card-alpha);
+  backdrop-filter: blur(30px);
+  -webkit-backdrop-filter: blur(30px);
+  padding: var(--space-md);
+  border-radius: var(--radius-lg);
+  border: 1px solid var(--glass-border);
+  color: var(--text-secondary);
+  box-shadow: var(--shadow-sm);
+  font-variant-numeric: tabular-nums;
+  box-sizing: border-box;
+  transition:
+    transform 0.2s ease,
+    box-shadow 0.2s ease,
+    border-color 0.2s ease;
+}
+
+/* Card Height Differentiation */
+.hero-cards,
+.cards-topay,
+.cards-toreceive {
   height: clamp(260px, 30vh, 340px);
-    background-color: var(--card-alpha);
-    backdrop-filter: blur(30px);
-    -webkit-backdrop-filter: blur(30px);
-    padding: 1rem;
-    border-radius: 18px;
-    border: 1px solid var(--glass-border);
-    color: var(--text-secondary);
-
-      transition:
-    transform 0.25s ease,
-    box-shadow 0.25s ease,
-    border-color 0.25s ease;
-
 }
-.cards:hover {
+
+.cards-list {
+  height: auto;
+  min-height: clamp(200px, 25vh, 320px);
+}
+
+/* Hover States (Only Interactive Cards Lift) */
+.cards-topay:hover,
+.cards-toreceive:hover {
   transform: translateY(-2px);
-   
+  box-shadow: var(--shadow-md);
+  border-color: var(--border);
 }
 
+.hero-cards:hover,
+.cards-list:hover {
+  transform: none;
+}
+
+/* Hero Summary Card Elevation & Highlight */
 .hero-cards {
-   box-shadow:
-    inset 0 1px 5px rgba(255,255,255,0.6),
-    inset 0 -10px 26px rgba(60,25,230,0.22),
-    inset 0 0 12px rgba(60,25,230,0.12);
-  
+  box-shadow: inset 0 1px 1px var(--glass-border), var(--shadow-lg);
+  border-top: 2px solid var(--interactive-bg);
 }
 
+/* Semantic Cards Styling */
+.cards-topay {
+  border-left: 4px solid var(--owe);
+}
+
+.cards-topay .pay-amount,
+.cards-topay .pay-total strong {
+  color: var(--owe);
+  font-variant-numeric: tabular-nums;
+}
+
+.cards-toreceive {
+  border-left: 4px solid var(--receive);
+}
+
+.cards-toreceive .receive-amount,
+.cards-toreceive .receive-total strong {
+  color: var(--receive);
+  font-variant-numeric: tabular-nums;
+}
+
+/* Responsive Breakpoints */
 @media (max-width: 1024px) {
   .dashboard-grid {
     grid-template-columns: repeat(12, 1fr);
+    gap: var(--space-md);
   }
 
   .dashboard-grid .col-6 {
@@ -56,26 +105,28 @@
 @media (max-width: 768px) {
   .dashboard-grid {
     grid-template-columns: 1fr;
+    gap: var(--space-sm);
+    padding: var(--space-sm);
   }
 
   .dashboard-grid > * {
     grid-column: span 1 !important;
   }
 
-   .hero-cards {
-    max-height: none !important;
-    height: auto;
-  }
-
+  .hero-cards,
+  .cards-topay,
+  .cards-toreceive,
+  .cards-list,
   .cards {
-     height: auto;
-    max-height: 180px;
-    padding: 0.8rem;
-    border-radius: 14px;
+    height: auto;
+    min-height: auto;
+    max-height: none !important;
+    padding: var(--space-sm);
+    border-radius: var(--radius-md);
   }
 
-  .dashboard-content {
-    padding: 1rem;
+  .cards-topay:hover,
+  .cards-toreceive:hover {
+    transform: none;
   }
 }
-

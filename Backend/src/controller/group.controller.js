@@ -37,7 +37,7 @@ const createGroup = async (req, res) => {
       });
     }
 
-    const createdBy = req.user.id;
+    const createdBy = req.user._id;
 
     if (!createdBy) {
       return res.status(400).json({
@@ -90,7 +90,7 @@ const createGroup = async (req, res) => {
 
 const getAllgroup = async (req, res) => {
   try {
-    const userId = req.user.id;
+    const userId = req.user._id;
 
     const groups = await Group.find({
       "members.userId": userId,
@@ -119,7 +119,7 @@ const getAllgroup = async (req, res) => {
 const getGroupbyId = async (req, res) => {
   try {
     const { groupId } = req.params;
-    const userId = req.user.id;
+    const userId = req.user._id;
 
     // Access control
     const group = await Group.findOne({
@@ -235,7 +235,7 @@ const CheckInviteCode = async (req, res) => {
 const joinGroup = async (req, res) => {
   try {
     const { inviteCode } = req.params;
-    const userId = req.user.id;
+    const userId = req.user._id; // P1: consistent _id
 
     const group = await Group.findOne({ inviteCode });
 
@@ -246,25 +246,24 @@ const joinGroup = async (req, res) => {
       });
     }
 
-    // Check if user already exists in members list
-    const alreadyMember = group.members.some(
-      (m) => m.userId.toString() === userId.toString(),
+    // P3: Atomic check-and-add — prevents duplicate member entry on parallel requests
+    const updateResult = await Group.updateOne(
+      { _id: group._id, "members.userId": { $ne: userId } },
+      { $push: { members: { userId } } }
     );
 
-    if (alreadyMember) {
-      return res.json({
-        success: true,
-        data: group,
-      });
+    const wasAlreadyMember = updateResult.modifiedCount === 0;
+
+    if (wasAlreadyMember) {
+      // Already a member — return populated group as success (idempotent)
+      const existingGroup = await Group.findById(group._id).populate(
+        "members.userId",
+        "name email avatar"
+      );
+      return res.json({ success: true, data: existingGroup });
     }
 
-    // Add new member with joinedAt timestamp
-    group.members.push({
-      userId,
-    });
-
-    await group.save();
-
+    // New member added — emit socket event
     const io = getIO();
     io.to(group._id.toString()).emit("member-joined", {
       groupId: group._id,
@@ -275,24 +274,31 @@ const joinGroup = async (req, res) => {
       createdAt: new Date(),
     });
 
+    // Collect existing member IDs (before new member joined)
     const existingMemberIds = group.members
-      .map(m => m.userId.toString())
-      .filter(id => id !== userId.toString());
+      .map((m) => m.userId.toString())
+      .filter((id) => id !== userId.toString());
 
+    // P2: Notification in isolated try-catch — failure won't block join success
     if (existingMemberIds.length > 0) {
-      await createNotification({
-        userIds: existingMemberIds,
-        title: "New Member Joined",
-        message: `${req.user.name} just joined the group ${group.name}`,
-        type: "group",
-        metadata: { groupId: group._id }
-      });
+      try {
+        await createNotification({
+          userIds: existingMemberIds,
+          title: "New Member Joined",
+          message: `${req.user.name} just joined the group ${group.name}`,
+          type: "group",
+          metadata: { groupId: group._id },
+        });
+      } catch (notifErr) {
+        console.error("Notification failed (non-critical):", notifErr);
+        // Swallow — notification failure must not fail the join response
+      }
     }
 
     // Populate before sending response
     const populatedGroup = await Group.findById(group._id).populate(
       "members.userId",
-      "name email avatar",
+      "name email avatar"
     );
 
     return res.json({
@@ -310,11 +316,10 @@ const joinGroup = async (req, res) => {
 };
 
 // Leave Group
-// Leave Group
 const leaveGroup = async (req, res) => {
   try {
     const { groupId } = req.params;
-    const userId = req.user.id;
+    const userId = req.user._id;
     const userName = req.user.name;
 
     const group = await Group.findById(groupId);
@@ -328,7 +333,7 @@ const leaveGroup = async (req, res) => {
 
     // Check if user is member
     const isMember = group.members.some(
-      (m) => m.userId.toString() === userId
+      (m) => m.userId.toString() === userId.toString()
     );
 
     if (!isMember) {
@@ -338,10 +343,32 @@ const leaveGroup = async (req, res) => {
       });
     }
 
-    // Check balance
-    const balance = await getUserNetBalance(groupId, userId);
+    // ── Balance check using same logic as UI (buildPayList / buildReceiveList) ──
+    const [expenses, settlements] = await Promise.all([
+      Expense.find({ groupId, deletedAt: null })
+        .select("amount paidBy splitType splits")
+        .lean(),
+      Settlement.find({ groupId })
+        .select("from to amount")
+        .lean(),
+    ]);
 
-    if (balance !== 0) {
+    // Populate members for buildPayList/buildReceiveList
+    const populatedGroup = await Group.findById(groupId)
+      .select("members")
+      .populate("members.userId", "name")
+      .lean();
+
+    const members = populatedGroup.members.map((m) => m.userId);
+
+    const payList     = buildPayList(expenses, settlements, members, userId);
+    const receiveList = buildReceiveList(expenses, settlements, members, userId);
+
+    const totalOwed    = payList.reduce((sum, p) => sum + p.amount, 0);
+    const totalReceive = receiveList.reduce((sum, r) => sum + r.amount, 0);
+
+    // Use same 0.01 tolerance as before to guard against floating-point dust
+    if (totalOwed > 0.01 || totalReceive > 0.01) {
       return res.status(400).json({
         success: false,
         message: "Please settle all balances before leaving the group",
@@ -351,22 +378,28 @@ const leaveGroup = async (req, res) => {
     const io = getIO();
 
     // Check if admin
-    const isAdmin = group.admin.toString() === userId;
+    const isAdmin = group.admin.toString() === userId.toString();
 
     // Remaining members
     const remainingMembers = group.members.filter(
-      (m) => m.userId.toString() !== userId
+      (m) => m.userId.toString() !== userId.toString()
     );
 
-    // Admin transfer
-    if (isAdmin && remainingMembers.length > 0) {
+    // Last member leaving — archive the orphan group
+    if (remainingMembers.length === 0) {
+      group.isArchived = true;
+    } else if (isAdmin) {
+      // Admin transfer: pick longest-standing remaining member
       remainingMembers.sort(
         (a, b) => new Date(a.joinedAt) - new Date(b.joinedAt)
       );
 
       group.admin = remainingMembers[0].userId;
 
-      
+      io.to(groupId).emit("admin-changed", {
+        groupId,
+        adminId: group.admin,
+      });
     }
 
     // Remove member

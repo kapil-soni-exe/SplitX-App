@@ -25,12 +25,48 @@ export function useGroupDetail(groupId) {
     );
   };
 
+  /**
+   * Instantly remove a member from the cached group members array
+   * when a member-left socket event fires (no API refetch needed).
+   */
+  const removeMemberLocal = (userId) => {
+    queryClient.setQueryData(["group", groupId], (prev) => {
+      if (!prev) return prev;
+      return {
+        ...prev,
+        members: prev.members.filter(
+          (m) => (m.userId?._id || m.userId)?.toString() !== userId?.toString()
+        ),
+      };
+    });
+  };
+
+  /**
+   * Instantly add a new member to the cached group members array
+   * when a member-joined socket event fires.
+   */
+  const addMemberLocal = (user) => {
+    queryClient.setQueryData(["group", groupId], (prev) => {
+      if (!prev) return prev;
+      const alreadyExists = prev.members.some(
+        (m) => (m.userId?._id || m.userId)?.toString() === user._id?.toString()
+      );
+      if (alreadyExists) return prev;
+      return {
+        ...prev,
+        members: [...prev.members, { userId: user, joinedAt: new Date() }],
+      };
+    });
+  };
+
   return {
     group: data,
-    loading: isLoading,             // true only on first load (no cache), false on group switch
-    isRefetching: isFetching && !isLoading, // background re-fetch indicator
+    loading: isLoading,
+    isRefetching: isFetching && !isLoading,
     error,
     updateAdminLocal,
+    removeMemberLocal,
+    addMemberLocal,
     refetch,
   };
 }

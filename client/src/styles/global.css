@@ -1,4 +1,4 @@
-@import "./variavles.css";
+@import "./variables.css";
 
 * {
     margin: 0;
@@ -64,4 +64,11 @@ a, button, input {
 
 ::-webkit-scrollbar-thumb:hover {
     background: var(--text-muted);
+}
+
+
+@media (hover: hover) and (pointer: fine) {
+  a, button, input {
+    cursor: none;
+  }
 }

@@ -6,7 +6,7 @@ const {setIO} = require("./socketManager")
 function initSocket(server){
   const io = new Server(server,{
     cors:{
-      origin: process.env.CLIENT_ORIGIN || "http://localhost:5173",
+      origin: true,
       credentials:true
     }
   })

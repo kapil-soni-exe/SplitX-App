@@ -1,3 +1,4 @@
+import { useState, useEffect } from "react";
 import {
   PieChart,
   Pie,
@@ -5,8 +6,44 @@ import {
   Tooltip,
 } from "recharts";
 
+/**
+ * Custom hook to read vibrant CSS design tokens dynamically at runtime
+ * and observe theme changes (data-theme attribute updates).
+ */
+function useThemeColors() {
+  const [colors, setColors] = useState({
+    receive: "",
+    owe: "",
+    accent: "",
+  });
+
+  useEffect(() => {
+    const readColors = () => {
+      const styles = getComputedStyle(document.documentElement);
+      setColors({
+        receive: styles.getPropertyValue("--receive").trim(),
+        owe: styles.getPropertyValue("--owe").trim(),
+        accent: styles.getPropertyValue("--accent").trim(),
+      });
+    };
+
+    readColors();
+
+    const observer = new MutationObserver(readColors);
+    observer.observe(document.documentElement, {
+      attributes: true,
+      attributeFilter: ["data-theme"],
+    });
+
+    return () => observer.disconnect();
+  }, []);
+
+  return colors;
+}
+
 function DonutChart({ total, paid, netBalance }) {
   const net = netBalance;
+  const themeColors = useThemeColors();
 
   const data = [
     {
@@ -19,9 +56,14 @@ function DonutChart({ total, paid, netBalance }) {
     },
   ];
 
+  // Full-strength vibrant color assignment with safe fallbacks
   const COLORS = [
-    net > 0 ? "#22c55e" : net < 0 ? "#ef4444" : "#3C19E6",
-    "#3C19E6",
+    (net > 0
+      ? themeColors.receive
+      : net < 0
+      ? themeColors.owe
+      : themeColors.accent) || "#6366F1",
+    themeColors.accent || "#4338CA",
   ];
 
   return (
