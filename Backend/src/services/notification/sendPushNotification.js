@@ -34,7 +34,7 @@ const sendPushNotification = async ({ tokens, title, body }) => {
           requireInteraction: true // Requires user to dismiss it manually
         },
         fcm_options: {
-          link: "https://splitx-app.vercel.app/" // Binds notification to PWA
+          link: "https://split-x-app-pied.vercel.app/" // Binds notification to PWA
         }
       }
     };
